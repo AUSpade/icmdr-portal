@@ -111,25 +111,19 @@ hr{border:none;border-top:1px solid #374151;margin:16px 0;}
     <button onclick="logout()">Logout</button>
   </div>
 
-  <!-- PROFILE -->
   <div class="screen active" id="profile">
     <h2>Profile</h2>
     <p><strong>Name:</strong> <span id="pName"></span></p>
     <p><strong>Username:</strong> <span id="pUser"></span></p>
     <p><strong>Rank:</strong> <span id="pRank"></span></p>
     <p><strong>Member #:</strong> <span id="pNum"></span></p>
-
-    <h3>This Month Roster (POC)</h3>
-    <div id="profileRoster"></div>
   </div>
 
-  <!-- ROSTER -->
   <div class="screen" id="roster">
     <h2>Unit Roster</h2>
     <div id="rosterView"></div>
   </div>
 
-  <!-- ADMIN -->
   <div class="screen" id="admin">
     <h2>Members</h2>
 
@@ -150,8 +144,6 @@ hr{border:none;border-top:1px solid #374151;margin:16px 0;}
 </div>
 
 <script>
-const SHIFTS=["Tue-D","Tue-N","Wed-D","Wed-N","Thu-D","Thu-N","Fri-D","Fri-N","Sat-D","Sat-N"];
-
 const RANK_RULES={
   "Section Leader":["Member","Section Leader"],
   "Deputy Controller":["Member","Section Leader"],
@@ -200,7 +192,6 @@ function login(){
     if(user.rank!=="Member"){
       adminMenu.innerHTML='<button onclick="openScreen(`admin`)">Admin</button>';
     } else adminMenu.innerHTML="";
-    renderProfileRoster();
   } else loginErr.style.display="block";
 }
 
@@ -209,13 +200,6 @@ function logout(){
   app.style.display="none";
   loginScreen.style.display="flex";
   menu.classList.remove("open");
-}
-
-function renderProfileRoster(){
-  profileRoster.innerHTML="";
-  SHIFTS.forEach(s=>{
-    profileRoster.innerHTML+=`<div>${s}: ${users[currentUser].roster[s]||"—"}</div>`;
-  });
 }
 
 function renderRoster(){
@@ -248,26 +232,45 @@ function renderAdmin(){
 
 function editUser(username){
   const me=Object.values(users).find(u=>u.username===currentUser);
-  const u=Object.values(users).find(x=>x.username===username);
   const allowed=RANK_RULES[me.rank]||[];
+  const originalKey=username;
+  const u=users[originalKey];
 
   memberList.innerHTML=`
     <div class="member">
-      Name <input value="${u.name}" onchange="u.name=this.value">
-      Member # <input value="${u.num}" onchange="u.num=this.value">
-      Username <input value="${u.username}" onchange="u.username=this.value">
-      Password <input value="${u.pass}" onchange="u.pass=this.value">
+      Name <input id="eName" value="${u.name}">
+      Member # <input id="eNum" value="${u.num}">
+      Username <input id="eUser" value="${u.username}">
+      Password <input id="ePass" value="${u.pass}">
       Rank
-      <select onchange="u.rank=this.value">
+      <select id="eRank">
         ${allowed.map(r=>`<option ${u.rank===r?"selected":""}>${r}</option>`).join("")}
       </select>
-      <button onclick="save();renderAdmin()">Save</button>
+      <button onclick="saveEdit('${originalKey}')">Save</button>
     </div>`;
+}
+
+function saveEdit(originalKey){
+  const newUsername=document.getElementById("eUser").value.trim();
+  const updated={
+    username:newUsername,
+    name:document.getElementById("eName").value,
+    num:document.getElementById("eNum").value,
+    pass:document.getElementById("ePass").value,
+    rank:document.getElementById("eRank").value,
+    roster:users[originalKey].roster||{}
+  };
+
+  delete users[originalKey];
+  users[newUsername]=updated;
+  save();
+  renderAdmin();
 }
 
 function createUser(){
   if(!addUsername.value)return alert("Username required");
   if(Object.values(users).some(u=>u.username===addUsername.value))return alert("Username exists");
+
   users[addUsername.value]={
     username:addUsername.value,
     name:addName.value,

@@ -9,62 +9,64 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #0f172a;
+  background: #0b1220;
   color: white;
 }
 
-/* TOP BAR */
 .topbar {
-  height: 50px;
-  background: #020617;
+  height: 52px;
+  background: #1e88e5;
   display: flex;
   align-items: center;
   padding: 0 15px;
 }
 
 .hamburger {
-  font-size: 24px;
+  font-size: 26px;
   cursor: pointer;
   margin-right: 15px;
 }
 
-.title {
-  font-weight: bold;
-}
-
-/* MENU */
 .menu {
   position: fixed;
   top: 0;
-  left: -260px;
-  width: 260px;
+  left: -280px;
+  width: 280px;
   height: 100%;
-  background: #020617;
+  background: #0f172a;
   padding: 20px;
   transition: 0.3s;
-  z-index: 1000;
+  z-index: 999;
 }
 
 .menu.open {
   left: 0;
 }
 
+.menu h3 {
+  margin-top: 0;
+}
+
 .menu button {
   width: 100%;
   margin-top: 10px;
+  padding: 10px;
+  background: #2563eb;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-/* SCREENS */
 .screen {
   display: none;
-  padding: 20px;
+  padding: 15px;
 }
 
 .screen.active {
   display: block;
 }
 
-/* LOGIN */
 .login {
   height: 100vh;
   display: flex;
@@ -72,7 +74,7 @@ body {
   align-items: center;
 }
 
-.box {
+.card {
   background: #020617;
   padding: 25px;
   border-radius: 8px;
@@ -87,40 +89,32 @@ input, select {
   border: none;
 }
 
-button {
-  padding: 10px;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
   margin-top: 10px;
-  background: #2563eb;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
 }
 
-/* PROFILE */
+.grid button {
+  padding: 8px;
+  font-size: 12px;
+}
+
 .profile-pic {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: #1e293b;
+  background: #334155;
   margin: 10px auto;
   background-size: cover;
   background-position: center;
 }
 
-/* ROSTER */
-.week {
-  background: #020617;
-  padding: 15px;
-  border-radius: 6px;
-  margin-top: 15px;
-}
-
-.day {
-  margin-top: 8px;
-  padding: 8px;
+.roster-day {
   background: #1e293b;
+  padding: 10px;
+  margin-top: 8px;
   border-radius: 4px;
 }
 </style>
@@ -130,20 +124,22 @@ button {
 
 <!-- MENU -->
 <div class="menu" id="menu">
-  <h3 id="menuUser">Profile</h3>
-  <button onclick="showScreen('profile')">Profile</button>
-  <button onclick="showScreen('roster')">Roster</button>
+  <h3 id="menuUser">User</h3>
+  <button onclick="openScreen('profile')">Profile</button>
+  <button onclick="openScreen('availability')">My Availability</button>
+  <button onclick="openScreen('roster')">Roster</button>
+  <div id="adminMenu"></div>
   <button onclick="logout()">Logout</button>
 </div>
 
 <!-- LOGIN -->
 <div class="login" id="loginScreen">
-  <div class="box">
+  <div class="card">
     <h2>Login</h2>
-    <input id="username" placeholder="Username">
-    <input id="password" type="password" placeholder="Password">
+    <input id="loginUser" placeholder="Username">
+    <input id="loginPass" type="password" placeholder="Password">
     <button onclick="login()">Login</button>
-    <p id="loginError" style="color:#f87171;display:none">Invalid login</p>
+    <p id="loginErr" style="color:#f87171;display:none">Invalid login</p>
   </div>
 </div>
 
@@ -152,130 +148,125 @@ button {
 
   <div class="topbar">
     <div class="hamburger" onclick="toggleMenu()">☰</div>
-    <div class="title">iCmdr Portal</div>
+    <strong>iCmdr Portal</strong>
   </div>
 
-  <!-- HOME -->
   <div class="screen active" id="home">
     <h2>Welcome</h2>
     <p>Select an option from the menu.</p>
   </div>
 
-  <!-- PROFILE -->
   <div class="screen" id="profile">
     <h2>Profile</h2>
-
     <div class="profile-pic" id="profilePic"></div>
     <input type="file" accept="image/*" onchange="uploadPhoto(event)">
+    <p><strong>Username:</strong> <span id="profileName"></span></p>
+    <p><strong>Rank:</strong> <span id="profileRank"></span></p>
+    <input id="newPass" type="password" placeholder="New password">
+    <button onclick="changePassword()">Change Password</button>
+  </div>
 
-    <p><strong>Username:</strong> <span id="profileUser"></span></p>
-
-    <h3>Change Password</h3>
-    <input id="newPassword" type="password" placeholder="New password">
-    <button onclick="changePassword()">Update Password</button>
-
-    <h3>Monthly Availability</h3>
-    <select id="daySelect">
-      <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
-      <option>Thursday</option><option>Friday</option>
-      <option>Saturday</option><option>Sunday</option>
-    </select>
-    <input id="availability" placeholder="Available / Unavailable / Night only">
+  <div class="screen" id="availability">
+    <h2>My Availability</h2>
+    <div class="grid" id="availGrid"></div>
     <button onclick="saveAvailability()">Save</button>
   </div>
 
-  <!-- ROSTER -->
   <div class="screen" id="roster">
-    <h2>Roster</h2>
-    <div id="rosterOutput"></div>
+    <h2>Unit Roster</h2>
+    <div id="rosterView"></div>
+  </div>
+
+  <div class="screen" id="admin">
+    <h2>Admin</h2>
+    <input id="newUser" placeholder="Username">
+    <input id="newPassAdmin" placeholder="Password">
+    <input id="newNum" placeholder="Member Number">
+    <select id="newRank">
+      <option>Member</option>
+      <option>Section Leader</option>
+      <option>Deputy Controller</option>
+      <option>Controller</option>
+      <option>SES Staff</option>
+      <option>Super Admin</option>
+    </select>
+    <button onclick="createUser()">Create User</button>
   </div>
 
 </div>
 
 <script>
 let users = JSON.parse(localStorage.getItem("users")) || {
-  admin: { password: "password123", roster: {}, photo: "" }
+  admin: { pass:"admin", rank:"Super Admin", num:"1", avail:{}, photo:"" }
 };
 
 let currentUser = "";
 
-function toggleMenu() {
-  document.getElementById("menu").classList.toggle("open");
+function save() {
+  localStorage.setItem("users", JSON.stringify(users));
 }
 
-function showScreen(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+function toggleMenu() {
+  menu.classList.toggle("open");
+}
+
+function openScreen(id) {
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   toggleMenu();
-  if (id === "roster") renderRoster();
+  if(id==="roster") renderRoster();
 }
 
 function login() {
-  const u = username.value;
-  const p = password.value;
-
-  if (users[u] && users[u].password === p) {
-    currentUser = u;
-    document.getElementById("menuUser").innerText = "👤 " + u;
-    document.getElementById("profileUser").innerText = u;
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    loadProfile();
-  } else {
-    loginError.style.display = "block";
-  }
+  const u = loginUser.value;
+  const p = loginPass.value;
+  if(users[u] && users[u].pass===p){
+    currentUser=u;
+    menuUser.innerText=`${users[u].num} ${u}`;
+    profileName.innerText=u;
+    profileRank.innerText=users[u].rank;
+    loginScreen.style.display="none";
+    app.style.display="block";
+    if(users[u].rank!=="Member"){
+      adminMenu.innerHTML='<button onclick="openScreen(`admin`)">Admin</button>';
+    }
+  } else loginErr.style.display="block";
 }
 
-function logout() {
-  currentUser = "";
-  document.getElementById("app").style.display = "none";
-  document.getElementById("loginScreen").style.display = "flex";
+function logout(){
+  currentUser="";
+  app.style.display="none";
+  loginScreen.style.display="flex";
   toggleMenu();
 }
 
-function changePassword() {
-  users[currentUser].password = newPassword.value;
+function uploadPhoto(e){
+  const r=new FileReader();
+  r.onload=()=>{users[currentUser].photo=r.result;profilePic.style.backgroundImage=`url(${r.result})`;save();};
+  r.readAsDataURL(e.target.files[0]);
+}
+
+function changePassword(){
+  users[currentUser].pass=newPass.value;
   save();
   alert("Password updated");
 }
 
-function uploadPhoto(e) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    users[currentUser].photo = reader.result;
-    document.getElementById("profilePic").style.backgroundImage =
-      `url(${reader.result})`;
-    save();
-  };
-  reader.readAsDataURL(e.target.files[0]);
-}
-
-function saveAvailability() {
-  users[currentUser].roster[daySelect.value] = availability.value;
+function createUser(){
+  users[newUser.value]={pass:newPassAdmin.value,rank:newRank.value,num:newNum.value,avail:{}};
   save();
-  alert("Saved");
+  alert("User created");
 }
 
-function renderRoster() {
-  const out = document.getElementById("rosterOutput");
-  out.innerHTML = "";
-  for (const day in users[currentUser].roster) {
-    out.innerHTML += `
-      <div class="day">
-        <strong>${day}</strong>: ${users[currentUser].roster[day]}
-      </div>`;
-  }
+function saveAvailability(){
+  alert("Saved (prototype)");
 }
 
-function loadProfile() {
-  if (users[currentUser].photo) {
-    document.getElementById("profilePic").style.backgroundImage =
-      `url(${users[currentUser].photo})`;
-  }
-}
-
-function save() {
-  localStorage.setItem("users", JSON.stringify(users));
+function renderRoster(){
+  rosterView.innerHTML="";
+  Object.keys(users).forEach(u=>{
+    rosterView.innerHTML+=`<div class="roster-day"><strong>${users[u].num} ${u}</strong></div>`;
+  });
 }
 </script>
 

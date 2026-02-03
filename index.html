@@ -11,6 +11,7 @@
   --panel:#111827;
   --panel2:#1f2937;
   --accent:#3b82f6;
+  --danger:#dc2626;
   --text:#e5e7eb;
 }
 body{
@@ -78,7 +79,16 @@ input,select{
   border-radius:8px;
   margin-bottom:10px;
 }
-hr{border:none;border-top:1px solid #374151;margin:16px 0;}
+.delete-btn{
+  background:var(--danger);
+}
+.shift{
+  background:#1e293b;
+  padding:6px;
+  border-radius:4px;
+  margin-top:4px;
+  font-size:13px;
+}
 </style>
 </head>
 
@@ -111,19 +121,25 @@ hr{border:none;border-top:1px solid #374151;margin:16px 0;}
     <button onclick="logout()">Logout</button>
   </div>
 
+  <!-- PROFILE -->
   <div class="screen active" id="profile">
     <h2>Profile</h2>
     <p><strong>Name:</strong> <span id="pName"></span></p>
     <p><strong>Username:</strong> <span id="pUser"></span></p>
     <p><strong>Rank:</strong> <span id="pRank"></span></p>
     <p><strong>Member #:</strong> <span id="pNum"></span></p>
+
+    <h3>This Month Roster (POC)</h3>
+    <div id="profileRoster"></div>
   </div>
 
+  <!-- ROSTER -->
   <div class="screen" id="roster">
     <h2>Unit Roster</h2>
     <div id="rosterView"></div>
   </div>
 
+  <!-- ADMIN -->
   <div class="screen" id="admin">
     <h2>Members</h2>
 
@@ -144,6 +160,8 @@ hr{border:none;border-top:1px solid #374151;margin:16px 0;}
 </div>
 
 <script>
+const SHIFTS=["Tue-D","Tue-N","Wed-D","Wed-N","Thu-D","Thu-N","Fri-D","Fri-N","Sat-D","Sat-N"];
+
 const RANK_RULES={
   "Section Leader":["Member","Section Leader"],
   "Deputy Controller":["Member","Section Leader"],
@@ -151,6 +169,8 @@ const RANK_RULES={
   "Staff":["Member","Section Leader","Deputy Controller","Controller"],
   "Super Admin":["Member","Section Leader","Deputy Controller","Controller","Staff","Super Admin"]
 };
+
+const DELETE_ALLOWED=["Controller","Staff","Super Admin"];
 
 let users=JSON.parse(localStorage.getItem("users"))||{
   admin:{
@@ -166,7 +186,6 @@ let users=JSON.parse(localStorage.getItem("users"))||{
 let currentUser="";
 
 function save(){localStorage.setItem("users",JSON.stringify(users));}
-
 function toggleMenu(){menu.classList.toggle("open");}
 
 function openScreen(id){
@@ -192,6 +211,7 @@ function login(){
     if(user.rank!=="Member"){
       adminMenu.innerHTML='<button onclick="openScreen(`admin`)">Admin</button>';
     } else adminMenu.innerHTML="";
+    renderProfileRoster();
   } else loginErr.style.display="block";
 }
 
@@ -202,15 +222,25 @@ function logout(){
   menu.classList.remove("open");
 }
 
+function renderProfileRoster(){
+  profileRoster.innerHTML="";
+  SHIFTS.forEach(s=>{
+    profileRoster.innerHTML+=`<div class="shift">${s}: ${users[currentUser].roster[s]||"—"}</div>`;
+  });
+}
+
 function renderRoster(){
   rosterView.innerHTML="";
   Object.values(users).forEach(u=>{
-    rosterView.innerHTML+=`<div class="member"><strong>${u.num} ${u.name}</strong> (${u.rank})</div>`;
+    rosterView.innerHTML+=`
+      <div class="member">
+        <strong>${u.num} ${u.name}</strong> (${u.rank})
+      </div>`;
   });
 }
 
 function renderAdmin(){
-  const me=Object.values(users).find(u=>u.username===currentUser);
+  const me=users[currentUser];
   memberList.innerHTML="";
   const canAdd=me.rank!=="Member"&&me.rank!=="Section Leader";
   createBox.style.display=canAdd?"block":"none";
@@ -226,15 +256,16 @@ function renderAdmin(){
         Username: ${u.username}<br>
         Rank: ${u.rank}<br>
         ${me.rank==="Section Leader"?"":`<button onclick="editUser('${u.username}')">Edit</button>`}
+        ${DELETE_ALLOWED.includes(me.rank)&&u.username!==currentUser?`<button class="delete-btn" onclick="deleteUser('${u.username}')">Delete</button>`:""}
       </div>`;
   });
 }
 
 function editUser(username){
-  const me=Object.values(users).find(u=>u.username===currentUser);
+  const me=users[currentUser];
+  const u=users[username];
   const allowed=RANK_RULES[me.rank]||[];
-  const originalKey=username;
-  const u=users[originalKey];
+  const allowRankEdit = me.rank==="Super Admin" || username!==currentUser;
 
   memberList.innerHTML=`
     <div class="member">
@@ -243,34 +274,39 @@ function editUser(username){
       Username <input id="eUser" value="${u.username}">
       Password <input id="ePass" value="${u.pass}">
       Rank
-      <select id="eRank">
+      <select id="eRank" ${allowRankEdit?"":"disabled"}>
         ${allowed.map(r=>`<option ${u.rank===r?"selected":""}>${r}</option>`).join("")}
       </select>
-      <button onclick="saveEdit('${originalKey}')">Save</button>
+      <button onclick="saveEdit('${username}')">Save</button>
     </div>`;
 }
 
 function saveEdit(originalKey){
-  const newUsername=document.getElementById("eUser").value.trim();
+  const newUser=document.getElementById("eUser").value.trim();
   const updated={
-    username:newUsername,
-    name:document.getElementById("eName").value,
-    num:document.getElementById("eNum").value,
-    pass:document.getElementById("ePass").value,
-    rank:document.getElementById("eRank").value,
+    username:newUser,
+    name:eName.value,
+    num:eNum.value,
+    pass:ePass.value,
+    rank:eRank.value,
     roster:users[originalKey].roster||{}
   };
-
   delete users[originalKey];
-  users[newUsername]=updated;
+  users[newUser]=updated;
+  save();
+  renderAdmin();
+}
+
+function deleteUser(username){
+  if(!confirm("Delete this member?"))return;
+  delete users[username];
   save();
   renderAdmin();
 }
 
 function createUser(){
   if(!addUsername.value)return alert("Username required");
-  if(Object.values(users).some(u=>u.username===addUsername.value))return alert("Username exists");
-
+  if(users[addUsername.value])return alert("Username exists");
   users[addUsername.value]={
     username:addUsername.value,
     name:addName.value,

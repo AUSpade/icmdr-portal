@@ -11,7 +11,7 @@
       background: #0f172a;
       color: white;
     }
-    .login, .portal {
+    .screen {
       height: 100vh;
       display: flex;
       justify-content: center;
@@ -42,7 +42,7 @@
       font-weight: bold;
       cursor: pointer;
     }
-    .portal {
+    #portal {
       display: none;
       flex-direction: column;
     }
@@ -59,20 +59,22 @@
 
 <body>
 
-<div class="login" id="login">
+<!-- LOGIN SCREEN -->
+<div class="screen" id="loginScreen">
   <div class="box">
     <h2>iCmdr Login</h2>
     <input id="user" placeholder="Username">
     <input id="pass" type="password" placeholder="Password">
-    <button onclick="login()">Login</button>
+    <button onclick="doLogin()">Login</button>
     <p id="err" style="color:#f87171;display:none">Invalid login</p>
   </div>
 </div>
 
-<div class="portal" id="portal">
+<!-- PORTAL -->
+<div class="screen" id="portal">
   <div class="top">
     <span>iCmdr Portal</span>
-    <button onclick="logout()" style="width:auto">Logout</button>
+    <button onclick="doLogout()" style="width:auto">Logout</button>
   </div>
 
   <div class="box">
@@ -82,34 +84,27 @@
 </div>
 
 <script>
-  const KEY = "C388C75F-3BBB-4081-919C-A6D00D46379F";
+  const AUTH_KEY = "C388C75F-3BBB-4081-919C-A6D00D46379F";
   const USERS = { admin: "password123" };
 
-  function login() {
+  function doLogin() {
     if (USERS[user.value] === pass.value) {
-      login.style.display = "none";
-      portal.style.display = "flex";
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("portal").style.display = "flex";
+      err.style.display = "none";
     } else {
       err.style.display = "block";
     }
   }
 
-  function logout() {
-    portal.style.display = "none";
-    login.style.display = "flex";
+  function doLogout() {
+    document.getElementById("portal").style.display = "none";
+    document.getElementById("loginScreen").style.display = "flex";
     user.value = "";
     pass.value = "";
     err.style.display = "none";
   }
 
   function openMobile() {
-    window.open(`https://icmdr.co/mobile.html?authKey=${KEY}`, "_blank");
-  }
-
-  function openResponder() {
-    window.open(`https://icmdr.co/responder.html?authKey=${KEY}`, "_blank");
-  }
-</script>
-
-</body>
-</html>
+    window.open(
+      `https://icmdr.co/mobile.htm

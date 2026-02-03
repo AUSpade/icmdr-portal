@@ -6,17 +6,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+:root {
+  --bg: #0b1220;
+  --panel: #111827;
+  --panel-2: #1f2937;
+  --accent: #3b82f6;
+  --text: #e5e7eb;
+}
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system;
-  background: #0b1220;
-  color: white;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* LOGIN */
+.login {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  background: var(--panel);
+  padding: 24px;
+  border-radius: 12px;
+  width: 320px;
 }
 
 /* TOP BAR */
 .topbar {
   height: 52px;
-  background: #1e88e5;
+  background: var(--panel);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -30,18 +53,19 @@ body {
 .hamburger {
   font-size: 26px;
   cursor: pointer;
+  user-select: none;
 }
 
 /* MENU */
 .menu {
   position: fixed;
-  top: 0;
-  right: -280px;
-  width: 280px;
-  height: 100%;
-  background: #0f172a;
+  top: 52px;
+  right: -260px;
+  width: 260px;
+  height: calc(100% - 52px);
+  background: var(--panel-2);
   padding: 16px;
-  transition: 0.25s;
+  transition: right 0.25s ease;
   z-index: 1000;
 }
 
@@ -51,16 +75,19 @@ body {
 
 .menu h3 {
   margin-top: 0;
+  margin-bottom: 12px;
 }
 
 .menu button {
   width: 100%;
   padding: 10px;
   margin-top: 8px;
-  background: #2563eb;
+  background: var(--accent);
   border: none;
   border-radius: 6px;
   color: white;
+  font-weight: 500;
+  cursor: pointer;
 }
 
 /* SCREENS */
@@ -73,21 +100,7 @@ body {
   display: block;
 }
 
-/* LOGIN */
-.login {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.card {
-  background: #020617;
-  padding: 24px;
-  border-radius: 10px;
-  width: 320px;
-}
-
+/* FORM */
 input, select {
   width: 100%;
   padding: 10px;
@@ -96,12 +109,16 @@ input, select {
   border: none;
 }
 
-/* ADMIN LIST */
+/* ADMIN */
 .user-row {
-  background: #1e293b;
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 8px;
+  background: var(--panel-2);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.save-btn {
+  background: #22c55e;
 }
 </style>
 </head>
@@ -119,15 +136,14 @@ input, select {
   </div>
 </div>
 
-<!-- APP (LOCKED UNTIL LOGIN) -->
+<!-- APP -->
 <div id="app" style="display:none">
 
   <div class="topbar">
     <div class="title">iCmdr – Morwell (POC)</div>
-    <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()">☰</div>
   </div>
 
-  <!-- MENU -->
   <div class="menu" id="menu">
     <h3 id="menuUser"></h3>
     <button onclick="openScreen('profile')">Profile</button>
@@ -149,8 +165,26 @@ input, select {
   </div>
 
   <div class="screen" id="admin">
-    <h2>Admin – Users</h2>
+    <h2>Admin</h2>
+
+    <h3>Create User</h3>
+    <input id="newUser" placeholder="Username">
+    <input id="newPassAdmin" placeholder="Password">
+    <input id="newNum" placeholder="Member Number">
+    <select id="newRank">
+      <option>Member</option>
+      <option>Section Leader</option>
+      <option>Deputy Controller</option>
+      <option>Controller</option>
+      <option>SES Staff</option>
+      <option>Super Admin</option>
+    </select>
+    <button onclick="createUser()">Create User</button>
+
+    <h3 style="margin-top:20px">Existing Users</h3>
     <div id="userList"></div>
+
+    <button class="save-btn" onclick="save()">Save Changes</button>
   </div>
 
 </div>
@@ -161,17 +195,27 @@ let users = JSON.parse(localStorage.getItem("users")) || {
 };
 
 let currentUser = "";
+let menuOpen = false;
 
-function save(){ localStorage.setItem("users",JSON.stringify(users)); }
+function save(){
+  localStorage.setItem("users",JSON.stringify(users));
+  alert("Saved");
+}
 
 function toggleMenu(){
-  menu.classList.toggle("open");
+  menuOpen = !menuOpen;
+  menu.classList.toggle("open", menuOpen);
+}
+
+function closeMenu(){
+  menuOpen = false;
+  menu.classList.remove("open");
 }
 
 function openScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-  toggleMenu();
+  closeMenu();
   if(id==="admin") renderAdmin();
 }
 
@@ -195,7 +239,17 @@ function logout(){
   currentUser="";
   app.style.display="none";
   loginScreen.style.display="flex";
-  menu.classList.remove("open");
+  closeMenu();
+}
+
+function createUser(){
+  if(!newUser.value) return alert("Username required");
+  users[newUser.value]={
+    pass:newPassAdmin.value,
+    rank:newRank.value,
+    num:newNum.value
+  };
+  renderAdmin();
 }
 
 function renderAdmin(){
@@ -204,14 +258,14 @@ function renderAdmin(){
     userList.innerHTML+=`
       <div class="user-row">
         <strong>${u}</strong><br>
-        Member #: <input value="${users[u].num}" onchange="users['${u}'].num=this.value;save()">
+        Member #: <input value="${users[u].num}" onchange="users['${u}'].num=this.value">
         Rank:
-        <select onchange="users['${u}'].rank=this.value;save()">
+        <select onchange="users['${u}'].rank=this.value">
           ${["Member","Section Leader","Deputy Controller","Controller","SES Staff","Super Admin"]
             .map(r=>`<option ${users[u].rank===r?"selected":""}>${r}</option>`).join("")}
         </select>
         Password:
-        <input value="${users[u].pass}" onchange="users['${u}'].pass=this.value;save()">
+        <input value="${users[u].pass}" onchange="users['${u}'].pass=this.value">
       </div>`;
   });
 }

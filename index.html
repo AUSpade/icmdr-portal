@@ -7,118 +7,100 @@
 
 <style>
 :root {
-  --bg: #0b1220;
-  --panel: #111827;
-  --panel-2: #1f2937;
-  --accent: #3b82f6;
-  --text: #e5e7eb;
+  --bg:#0b1220;
+  --panel:#111827;
+  --panel2:#1f2937;
+  --accent:#3b82f6;
+  --text:#e5e7eb;
 }
 
 body {
-  margin: 0;
-  font-family: system-ui, -apple-system;
-  background: var(--bg);
-  color: var(--text);
+  margin:0;
+  font-family:system-ui,-apple-system;
+  background:var(--bg);
+  color:var(--text);
 }
 
 /* LOGIN */
 .login {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-
 .card {
-  background: var(--panel);
-  padding: 24px;
-  border-radius: 12px;
-  width: 320px;
+  background:var(--panel);
+  padding:24px;
+  border-radius:12px;
+  width:320px;
 }
 
 /* TOP BAR */
 .topbar {
-  height: 52px;
-  background: var(--panel);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
+  height:52px;
+  background:var(--panel);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 16px;
 }
-
-.title {
-  font-weight: 600;
-}
-
 .hamburger {
-  font-size: 26px;
-  cursor: pointer;
-  user-select: none;
+  font-size:26px;
+  cursor:pointer;
 }
 
 /* MENU */
 .menu {
-  position: fixed;
-  top: 52px;
-  right: -260px;
-  width: 260px;
-  height: calc(100% - 52px);
-  background: var(--panel-2);
-  padding: 16px;
-  transition: right 0.25s ease;
-  z-index: 1000;
+  position:fixed;
+  top:52px;
+  right:-260px;
+  width:260px;
+  height:calc(100% - 52px);
+  background:var(--panel2);
+  padding:16px;
+  transition:0.25s;
 }
-
-.menu.open {
-  right: 0;
-}
-
-.menu h3 {
-  margin-top: 0;
-  margin-bottom: 12px;
-}
+.menu.open { right:0; }
 
 .menu button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  background: var(--accent);
-  border: none;
-  border-radius: 6px;
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  background:var(--accent);
+  border:none;
+  border-radius:6px;
+  color:white;
 }
 
 /* SCREENS */
-.screen {
-  display: none;
-  padding: 16px;
-}
+.screen { display:none; padding:16px; }
+.screen.active { display:block; }
 
-.screen.active {
-  display: block;
-}
-
-/* FORM */
 input, select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  border-radius: 6px;
-  border: none;
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  border-radius:6px;
+  border:none;
 }
 
-/* ADMIN */
-.user-row {
-  background: var(--panel-2);
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 10px;
+/* ADMIN LIST */
+.member {
+  background:var(--panel2);
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:10px;
+}
+.member button {
+  margin-top:6px;
 }
 
-.save-btn {
-  background: #22c55e;
+/* ROSTER GRID */
+.shift {
+  background:#1e293b;
+  padding:10px;
+  border-radius:6px;
+  margin-bottom:6px;
 }
 </style>
 </head>
@@ -140,8 +122,8 @@ input, select {
 <div id="app" style="display:none">
 
   <div class="topbar">
-    <div class="title">iCmdr – Morwell (POC)</div>
-    <div class="hamburger" id="hamburger" onclick="toggleMenu()">☰</div>
+    <strong>iCmdr – Morwell (POC)</strong>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
   </div>
 
   <div class="menu" id="menu">
@@ -152,86 +134,84 @@ input, select {
     <button onclick="logout()">Logout</button>
   </div>
 
+  <!-- PROFILE -->
   <div class="screen active" id="profile">
     <h2>Profile</h2>
-    <p><strong>User:</strong> <span id="profileName"></span></p>
-    <p><strong>Rank:</strong> <span id="profileRank"></span></p>
-    <p><strong>Member #:</strong> <span id="profileNum"></span></p>
+    <p><strong>Name:</strong> <span id="pName"></span></p>
+    <p><strong>Username:</strong> <span id="pUser"></span></p>
+    <p><strong>Rank:</strong> <span id="pRank"></span></p>
+    <p><strong>Member #:</strong> <span id="pNum"></span></p>
+
+    <h3>This Month Availability</h3>
+    <div id="profileRoster"></div>
   </div>
 
+  <!-- ROSTER -->
   <div class="screen" id="roster">
-    <h2>Roster</h2>
-    <p>Roster view placeholder</p>
+    <h2>Unit Roster</h2>
+    <div id="rosterView"></div>
   </div>
 
+  <!-- ADMIN -->
   <div class="screen" id="admin">
-    <h2>Admin</h2>
-
-    <h3>Create User</h3>
-    <input id="newUser" placeholder="Username">
-    <input id="newPassAdmin" placeholder="Password">
-    <input id="newNum" placeholder="Member Number">
-    <select id="newRank">
-      <option>Member</option>
-      <option>Section Leader</option>
-      <option>Deputy Controller</option>
-      <option>Controller</option>
-      <option>SES Staff</option>
-      <option>Super Admin</option>
-    </select>
-    <button onclick="createUser()">Create User</button>
-
-    <h3 style="margin-top:20px">Existing Users</h3>
-    <div id="userList"></div>
-
-    <button class="save-btn" onclick="save()">Save Changes</button>
+    <h2>Members</h2>
+    <div id="memberList"></div>
   </div>
 
 </div>
 
 <script>
-let users = JSON.parse(localStorage.getItem("users")) || {
-  admin:{pass:"admin",rank:"Super Admin",num:"33"}
+const SHIFTS=["Tue-D","Tue-N","Wed-D","Wed-N","Thu-D","Thu-N","Fri-D","Fri-N","Sat-D","Sat-N"];
+
+const RANK_RULES={
+  "Section Leader":["Member","Section Leader"],
+  "Deputy Controller":["Member","Section Leader"],
+  "Controller":["Member","Section Leader","Deputy Controller"],
+  "Staff":["Member","Section Leader","Deputy Controller","Controller"],
+  "Super Admin":["Member","Section Leader","Deputy Controller","Controller","Staff","Super Admin"]
 };
 
-let currentUser = "";
-let menuOpen = false;
+let users=JSON.parse(localStorage.getItem("users"))||{
+  admin:{
+    username:"admin",
+    name:"Aaron Robbins",
+    pass:"admin",
+    rank:"Super Admin",
+    num:"33",
+    roster:{}
+  }
+};
 
-function save(){
-  localStorage.setItem("users",JSON.stringify(users));
-  alert("Saved");
-}
+let currentUser="";
 
-function toggleMenu(){
-  menuOpen = !menuOpen;
-  menu.classList.toggle("open", menuOpen);
-}
+function save(){ localStorage.setItem("users",JSON.stringify(users)); }
 
-function closeMenu(){
-  menuOpen = false;
-  menu.classList.remove("open");
-}
+function toggleMenu(){ menu.classList.toggle("open"); }
 
 function openScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-  closeMenu();
+  toggleMenu();
   if(id==="admin") renderAdmin();
+  if(id==="roster") renderRoster();
 }
 
 function login(){
   const u=loginUser.value,p=loginPass.value;
-  if(users[u] && users[u].pass===p){
-    currentUser=u;
-    menuUser.innerText=`${users[u].num} ${u}`;
-    profileName.innerText=u;
-    profileRank.innerText=users[u].rank;
-    profileNum.innerText=users[u].num;
+  const user=Object.values(users).find(x=>x.username===u && x.pass===p);
+  if(user){
+    currentUser=user.username;
+    menuUser.innerText=`${user.num} ${user.name}`;
+    pName.innerText=user.name;
+    pUser.innerText=user.username;
+    pRank.innerText=user.rank;
+    pNum.innerText=user.num;
     loginScreen.style.display="none";
     app.style.display="block";
-    if(users[u].rank!=="Member"){
+    if(user.rank!=="Member"){
       adminMenu.innerHTML='<button onclick="openScreen(`admin`)">Admin</button>';
     }
+    renderProfileRoster();
   } else loginErr.style.display="block";
 }
 
@@ -239,34 +219,53 @@ function logout(){
   currentUser="";
   app.style.display="none";
   loginScreen.style.display="flex";
-  closeMenu();
-}
-
-function createUser(){
-  if(!newUser.value) return alert("Username required");
-  users[newUser.value]={
-    pass:newPassAdmin.value,
-    rank:newRank.value,
-    num:newNum.value
-  };
-  renderAdmin();
+  menu.classList.remove("open");
 }
 
 function renderAdmin(){
-  userList.innerHTML="";
-  Object.keys(users).forEach(u=>{
-    userList.innerHTML+=`
-      <div class="user-row">
-        <strong>${u}</strong><br>
-        Member #: <input value="${users[u].num}" onchange="users['${u}'].num=this.value">
-        Rank:
-        <select onchange="users['${u}'].rank=this.value">
-          ${["Member","Section Leader","Deputy Controller","Controller","SES Staff","Super Admin"]
-            .map(r=>`<option ${users[u].rank===r?"selected":""}>${r}</option>`).join("")}
-        </select>
-        Password:
-        <input value="${users[u].pass}" onchange="users['${u}'].pass=this.value">
+  const me=Object.values(users).find(u=>u.username===currentUser);
+  memberList.innerHTML="";
+  Object.values(users).forEach(u=>{
+    const canEdit = me.rank!=="Section Leader";
+    memberList.innerHTML+=`
+      <div class="member">
+        <strong>${u.num} ${u.name}</strong><br>
+        Rank: ${u.rank}<br>
+        ${canEdit?`<button onclick="editUser('${u.username}')">Edit</button>`:""}
       </div>`;
+  });
+}
+
+function editUser(username){
+  const me=Object.values(users).find(u=>u.username===currentUser);
+  const u=Object.values(users).find(x=>x.username===username);
+  const allowed=RANK_RULES[me.rank]||[];
+
+  memberList.innerHTML=`
+    <div class="member">
+      Name <input value="${u.name}" onchange="u.name=this.value">
+      Member # <input value="${u.num}" onchange="u.num=this.value">
+      Username <input value="${u.username}" onchange="u.username=this.value">
+      Password <input value="${u.pass}" onchange="u.pass=this.value">
+      Rank
+      <select onchange="u.rank=this.value">
+        ${allowed.map(r=>`<option ${u.rank===r?"selected":""}>${r}</option>`).join("")}
+      </select>
+      <button onclick="save();renderAdmin()">Save</button>
+    </div>`;
+}
+
+function renderProfileRoster(){
+  profileRoster.innerHTML="";
+  SHIFTS.forEach(s=>{
+    profileRoster.innerHTML+=`<div class="shift">${s}: ${users[currentUser].roster[s]||"—"}</div>`;
+  });
+}
+
+function renderRoster(){
+  rosterView.innerHTML="";
+  Object.values(users).forEach(u=>{
+    rosterView.innerHTML+=`<div class="member"><strong>${u.num} ${u.name}</strong></div>`;
   });
 }
 </script>

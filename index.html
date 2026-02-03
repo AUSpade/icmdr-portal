@@ -8,7 +8,7 @@
 <style>
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  font-family: system-ui, -apple-system;
   background: #0b1220;
   color: white;
 }
@@ -19,24 +19,24 @@ body {
   background: #1e88e5;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 16px;
-}
-
-.hamburger {
-  font-size: 26px;
-  cursor: pointer;
-  margin-right: 14px;
 }
 
 .title {
   font-weight: 600;
 }
 
+.hamburger {
+  font-size: 26px;
+  cursor: pointer;
+}
+
 /* MENU */
 .menu {
   position: fixed;
   top: 0;
-  left: -280px;
+  right: -280px;
   width: 280px;
   height: 100%;
   background: #0f172a;
@@ -46,12 +46,11 @@ body {
 }
 
 .menu.open {
-  left: 0;
+  right: 0;
 }
 
 .menu h3 {
   margin-top: 0;
-  font-size: 18px;
 }
 
 .menu button {
@@ -62,7 +61,6 @@ body {
   border: none;
   border-radius: 6px;
   color: white;
-  font-weight: 500;
 }
 
 /* SCREENS */
@@ -98,44 +96,8 @@ input, select {
   border: none;
 }
 
-/* PROFILE */
-.profile-pic {
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  background: #334155;
-  margin: 12px auto;
-  background-size: cover;
-  background-position: center;
-}
-
-/* AVAILABILITY */
-.shift {
-  background: #1e293b;
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 8px;
-}
-
-.shift-title {
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.shift-buttons button {
-  width: 32%;
-  padding: 8px;
-  font-size: 13px;
-  background: #334155;
-}
-
-.shift-buttons button.active {
-  background: #22c55e;
-  color: black;
-}
-
-/* ROSTER */
-.roster-row {
+/* ADMIN LIST */
+.user-row {
   background: #1e293b;
   padding: 10px;
   border-radius: 6px;
@@ -145,16 +107,6 @@ input, select {
 </head>
 
 <body>
-
-<!-- MENU -->
-<div class="menu" id="menu">
-  <h3 id="menuUser"></h3>
-  <button onclick="openScreen('profile')">Profile</button>
-  <button onclick="openScreen('availability')">My Availability</button>
-  <button onclick="openScreen('roster')">Roster</button>
-  <div id="adminMenu"></div>
-  <button onclick="logout()">Logout</button>
-</div>
 
 <!-- LOGIN -->
 <div class="login" id="loginScreen">
@@ -167,81 +119,65 @@ input, select {
   </div>
 </div>
 
-<!-- APP -->
+<!-- APP (LOCKED UNTIL LOGIN) -->
 <div id="app" style="display:none">
+
   <div class="topbar">
-    <div class="hamburger" onclick="toggleMenu()">☰</div>
     <div class="title">iCmdr – Morwell (POC)</div>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
   </div>
 
-  <div class="screen active" id="home">
-    <h2>Welcome</h2>
-    <p>Select an option from the menu.</p>
+  <!-- MENU -->
+  <div class="menu" id="menu">
+    <h3 id="menuUser"></h3>
+    <button onclick="openScreen('profile')">Profile</button>
+    <button onclick="openScreen('roster')">Roster</button>
+    <div id="adminMenu"></div>
+    <button onclick="logout()">Logout</button>
   </div>
 
-  <div class="screen" id="profile">
+  <div class="screen active" id="profile">
     <h2>Profile</h2>
-    <div class="profile-pic" id="profilePic"></div>
-    <input type="file" accept="image/*" onchange="uploadPhoto(event)">
     <p><strong>User:</strong> <span id="profileName"></span></p>
     <p><strong>Rank:</strong> <span id="profileRank"></span></p>
     <p><strong>Member #:</strong> <span id="profileNum"></span></p>
-    <input id="newPass" type="password" placeholder="New password">
-    <button onclick="changePassword()">Change Password</button>
-  </div>
-
-  <div class="screen" id="availability">
-    <h2>My Availability</h2>
-    <div id="availabilityList"></div>
-    <button onclick="saveAvailability()">Save</button>
-    <button onclick="resetAvailability()">Reset</button>
   </div>
 
   <div class="screen" id="roster">
-    <h2>Unit Roster</h2>
-    <div id="rosterView"></div>
+    <h2>Roster</h2>
+    <p>Roster view placeholder</p>
   </div>
 
   <div class="screen" id="admin">
-    <h2>Admin</h2>
-    <input id="newUser" placeholder="Username">
-    <input id="newPassAdmin" placeholder="Password">
-    <input id="newNum" placeholder="Member Number">
-    <select id="newRank">
-      <option>Member</option>
-      <option>Section Leader</option>
-      <option>Deputy Controller</option>
-      <option>Controller</option>
-      <option>SES Staff</option>
-      <option>Super Admin</option>
-    </select>
-    <button onclick="createUser()">Create User</button>
+    <h2>Admin – Users</h2>
+    <div id="userList"></div>
   </div>
+
 </div>
 
 <script>
-const SHIFTS = ["Tue-D","Tue-N","Wed-D","Wed-N","Thu-D","Thu-N","Fri-D","Fri-N","Sat-D","Sat-N"];
-
 let users = JSON.parse(localStorage.getItem("users")) || {
-  admin:{pass:"admin",rank:"Super Admin",num:"33",avail:{},photo:""}
+  admin:{pass:"admin",rank:"Super Admin",num:"33"}
 };
 
 let currentUser = "";
 
 function save(){ localStorage.setItem("users",JSON.stringify(users)); }
 
-function toggleMenu(){ menu.classList.toggle("open"); }
+function toggleMenu(){
+  menu.classList.toggle("open");
+}
 
 function openScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   toggleMenu();
-  if(id==="roster") renderRoster();
+  if(id==="admin") renderAdmin();
 }
 
 function login(){
   const u=loginUser.value,p=loginPass.value;
-  if(users[u]&&users[u].pass===p){
+  if(users[u] && users[u].pass===p){
     currentUser=u;
     menuUser.innerText=`${users[u].num} ${u}`;
     profileName.innerText=u;
@@ -249,7 +185,6 @@ function login(){
     profileNum.innerText=users[u].num;
     loginScreen.style.display="none";
     app.style.display="block";
-    buildAvailability();
     if(users[u].rank!=="Member"){
       adminMenu.innerHTML='<button onclick="openScreen(`admin`)">Admin</button>';
     }
@@ -260,63 +195,25 @@ function logout(){
   currentUser="";
   app.style.display="none";
   loginScreen.style.display="flex";
-  toggleMenu();
+  menu.classList.remove("open");
 }
 
-function uploadPhoto(e){
-  const r=new FileReader();
-  r.onload=()=>{users[currentUser].photo=r.result;profilePic.style.backgroundImage=`url(${r.result})`;save();};
-  r.readAsDataURL(e.target.files[0]);
-}
-
-function changePassword(){
-  users[currentUser].pass=newPass.value;
-  save();
-  alert("Password updated");
-}
-
-function buildAvailability(){
-  availabilityList.innerHTML="";
-  SHIFTS.forEach(s=>{
-    availabilityList.innerHTML+=`
-      <div class="shift">
-        <div class="shift-title">${s}</div>
-        <div class="shift-buttons">
-          <button onclick="setAvail('${s}','NA')">N/A</button>
-          <button onclick="setAvail('${s}','YES')">YES</button>
-          <button onclick="setAvail('${s}','RCR')">RCR</button>
-        </div>
+function renderAdmin(){
+  userList.innerHTML="";
+  Object.keys(users).forEach(u=>{
+    userList.innerHTML+=`
+      <div class="user-row">
+        <strong>${u}</strong><br>
+        Member #: <input value="${users[u].num}" onchange="users['${u}'].num=this.value;save()">
+        Rank:
+        <select onchange="users['${u}'].rank=this.value;save()">
+          ${["Member","Section Leader","Deputy Controller","Controller","SES Staff","Super Admin"]
+            .map(r=>`<option ${users[u].rank===r?"selected":""}>${r}</option>`).join("")}
+        </select>
+        Password:
+        <input value="${users[u].pass}" onchange="users['${u}'].pass=this.value;save()">
       </div>`;
   });
-}
-
-function setAvail(shift,val){
-  users[currentUser].avail[shift]=val;
-  save();
-}
-
-function saveAvailability(){ alert("Availability saved"); }
-
-function resetAvailability(){
-  users[currentUser].avail={};
-  save();
-  buildAvailability();
-}
-
-function renderRoster(){
-  rosterView.innerHTML="";
-  Object.values(users).forEach(u=>{
-    rosterView.innerHTML+=`
-      <div class="roster-row">
-        <strong>${u.num}</strong> – ${u.rank}
-      </div>`;
-  });
-}
-
-function createUser(){
-  users[newUser.value]={pass:newPassAdmin.value,rank:newRank.value,num:newNum.value,avail:{}};
-  save();
-  alert("User created");
 }
 </script>
 

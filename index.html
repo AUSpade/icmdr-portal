@@ -2,31 +2,37 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>iCmdr Portal</title>
+<title>iCmdr POC</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
   background: #0b1220;
   color: white;
 }
 
+/* TOP BAR */
 .topbar {
   height: 52px;
   background: #1e88e5;
   display: flex;
   align-items: center;
-  padding: 0 15px;
+  padding: 0 16px;
 }
 
 .hamburger {
   font-size: 26px;
   cursor: pointer;
-  margin-right: 15px;
+  margin-right: 14px;
 }
 
+.title {
+  font-weight: 600;
+}
+
+/* MENU */
 .menu {
   position: fixed;
   top: 0;
@@ -34,9 +40,9 @@ body {
   width: 280px;
   height: 100%;
   background: #0f172a;
-  padding: 20px;
-  transition: 0.3s;
-  z-index: 999;
+  padding: 16px;
+  transition: 0.25s;
+  z-index: 1000;
 }
 
 .menu.open {
@@ -45,28 +51,31 @@ body {
 
 .menu h3 {
   margin-top: 0;
+  font-size: 18px;
 }
 
 .menu button {
   width: 100%;
-  margin-top: 10px;
   padding: 10px;
+  margin-top: 8px;
   background: #2563eb;
   border: none;
+  border-radius: 6px;
   color: white;
-  border-radius: 4px;
-  cursor: pointer;
+  font-weight: 500;
 }
 
+/* SCREENS */
 .screen {
   display: none;
-  padding: 15px;
+  padding: 16px;
 }
 
 .screen.active {
   display: block;
 }
 
+/* LOGIN */
 .login {
   height: 100vh;
   display: flex;
@@ -76,8 +85,8 @@ body {
 
 .card {
   background: #020617;
-  padding: 25px;
-  border-radius: 8px;
+  padding: 24px;
+  border-radius: 10px;
   width: 320px;
 }
 
@@ -85,37 +94,52 @@ input, select {
   width: 100%;
   padding: 10px;
   margin-top: 8px;
-  border-radius: 4px;
+  border-radius: 6px;
   border: none;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.grid button {
-  padding: 8px;
-  font-size: 12px;
-}
-
+/* PROFILE */
 .profile-pic {
-  width: 80px;
-  height: 80px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
   background: #334155;
-  margin: 10px auto;
+  margin: 12px auto;
   background-size: cover;
   background-position: center;
 }
 
-.roster-day {
+/* AVAILABILITY */
+.shift {
   background: #1e293b;
   padding: 10px;
-  margin-top: 8px;
-  border-radius: 4px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.shift-title {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.shift-buttons button {
+  width: 32%;
+  padding: 8px;
+  font-size: 13px;
+  background: #334155;
+}
+
+.shift-buttons button.active {
+  background: #22c55e;
+  color: black;
+}
+
+/* ROSTER */
+.roster-row {
+  background: #1e293b;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
 }
 </style>
 </head>
@@ -124,7 +148,7 @@ input, select {
 
 <!-- MENU -->
 <div class="menu" id="menu">
-  <h3 id="menuUser">User</h3>
+  <h3 id="menuUser"></h3>
   <button onclick="openScreen('profile')">Profile</button>
   <button onclick="openScreen('availability')">My Availability</button>
   <button onclick="openScreen('roster')">Roster</button>
@@ -145,10 +169,9 @@ input, select {
 
 <!-- APP -->
 <div id="app" style="display:none">
-
   <div class="topbar">
     <div class="hamburger" onclick="toggleMenu()">☰</div>
-    <strong>iCmdr Portal</strong>
+    <div class="title">iCmdr – Morwell (POC)</div>
   </div>
 
   <div class="screen active" id="home">
@@ -160,16 +183,18 @@ input, select {
     <h2>Profile</h2>
     <div class="profile-pic" id="profilePic"></div>
     <input type="file" accept="image/*" onchange="uploadPhoto(event)">
-    <p><strong>Username:</strong> <span id="profileName"></span></p>
+    <p><strong>User:</strong> <span id="profileName"></span></p>
     <p><strong>Rank:</strong> <span id="profileRank"></span></p>
+    <p><strong>Member #:</strong> <span id="profileNum"></span></p>
     <input id="newPass" type="password" placeholder="New password">
     <button onclick="changePassword()">Change Password</button>
   </div>
 
   <div class="screen" id="availability">
     <h2>My Availability</h2>
-    <div class="grid" id="availGrid"></div>
+    <div id="availabilityList"></div>
     <button onclick="saveAvailability()">Save</button>
+    <button onclick="resetAvailability()">Reset</button>
   </div>
 
   <div class="screen" id="roster">
@@ -192,41 +217,39 @@ input, select {
     </select>
     <button onclick="createUser()">Create User</button>
   </div>
-
 </div>
 
 <script>
+const SHIFTS = ["Tue-D","Tue-N","Wed-D","Wed-N","Thu-D","Thu-N","Fri-D","Fri-N","Sat-D","Sat-N"];
+
 let users = JSON.parse(localStorage.getItem("users")) || {
-  admin: { pass:"admin", rank:"Super Admin", num:"1", avail:{}, photo:"" }
+  admin:{pass:"admin",rank:"Super Admin",num:"33",avail:{},photo:""}
 };
 
 let currentUser = "";
 
-function save() {
-  localStorage.setItem("users", JSON.stringify(users));
-}
+function save(){ localStorage.setItem("users",JSON.stringify(users)); }
 
-function toggleMenu() {
-  menu.classList.toggle("open");
-}
+function toggleMenu(){ menu.classList.toggle("open"); }
 
-function openScreen(id) {
+function openScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   toggleMenu();
   if(id==="roster") renderRoster();
 }
 
-function login() {
-  const u = loginUser.value;
-  const p = loginPass.value;
-  if(users[u] && users[u].pass===p){
+function login(){
+  const u=loginUser.value,p=loginPass.value;
+  if(users[u]&&users[u].pass===p){
     currentUser=u;
     menuUser.innerText=`${users[u].num} ${u}`;
     profileName.innerText=u;
     profileRank.innerText=users[u].rank;
+    profileNum.innerText=users[u].num;
     loginScreen.style.display="none";
     app.style.display="block";
+    buildAvailability();
     if(users[u].rank!=="Member"){
       adminMenu.innerHTML='<button onclick="openScreen(`admin`)">Admin</button>';
     }
@@ -252,21 +275,48 @@ function changePassword(){
   alert("Password updated");
 }
 
-function createUser(){
-  users[newUser.value]={pass:newPassAdmin.value,rank:newRank.value,num:newNum.value,avail:{}};
-  save();
-  alert("User created");
+function buildAvailability(){
+  availabilityList.innerHTML="";
+  SHIFTS.forEach(s=>{
+    availabilityList.innerHTML+=`
+      <div class="shift">
+        <div class="shift-title">${s}</div>
+        <div class="shift-buttons">
+          <button onclick="setAvail('${s}','NA')">N/A</button>
+          <button onclick="setAvail('${s}','YES')">YES</button>
+          <button onclick="setAvail('${s}','RCR')">RCR</button>
+        </div>
+      </div>`;
+  });
 }
 
-function saveAvailability(){
-  alert("Saved (prototype)");
+function setAvail(shift,val){
+  users[currentUser].avail[shift]=val;
+  save();
+}
+
+function saveAvailability(){ alert("Availability saved"); }
+
+function resetAvailability(){
+  users[currentUser].avail={};
+  save();
+  buildAvailability();
 }
 
 function renderRoster(){
   rosterView.innerHTML="";
-  Object.keys(users).forEach(u=>{
-    rosterView.innerHTML+=`<div class="roster-day"><strong>${users[u].num} ${u}</strong></div>`;
+  Object.values(users).forEach(u=>{
+    rosterView.innerHTML+=`
+      <div class="roster-row">
+        <strong>${u.num}</strong> – ${u.rank}
+      </div>`;
   });
+}
+
+function createUser(){
+  users[newUser.value]={pass:newPassAdmin.value,rank:newRank.value,num:newNum.value,avail:{}};
+  save();
+  alert("User created");
 }
 </script>
 

@@ -11,12 +11,19 @@
       background: #0f172a;
       color: white;
     }
+
     .screen {
       height: 100vh;
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
     }
+
+    .screen.active {
+      display: flex;
+    }
+
     .box {
       background: #020617;
       padding: 30px;
@@ -24,6 +31,7 @@
       width: 320px;
       text-align: center;
     }
+
     input {
       width: 100%;
       padding: 10px;
@@ -31,6 +39,7 @@
       border-radius: 4px;
       border: none;
     }
+
     button {
       width: 100%;
       padding: 12px;
@@ -42,44 +51,75 @@
       font-weight: bold;
       cursor: pointer;
     }
-    #portal {
-      display: none;
-      flex-direction: column;
-    }
-    .top {
+
+    /* TOP BAR */
+    .topbar {
+      width: 100%;
       background: #020617;
       padding: 10px;
-      width: 100%;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+    }
+
+    .hamburger {
+      font-size: 24px;
+      cursor: pointer;
+      margin-right: 15px;
+    }
+
+    /* MENU */
+    .menu {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 260px;
+      height: 100%;
+      background: #020617;
+      padding: 20px;
+      transition: 0.3s;
+      z-index: 1000;
+    }
+
+    .menu.open {
+      left: 0;
+    }
+
+    .menu button {
+      margin-top: 10px;
     }
   </style>
 </head>
 
 <body>
 
-<!-- LOGIN SCREEN -->
-<div class="screen" id="loginScreen">
+<!-- HAMBURGER MENU -->
+<div class="menu" id="menu">
+  <h3 id="profileName">Profile</h3>
+  <button onclick="showProfile()">Profile</button>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<!-- LOGIN -->
+<div class="screen active" id="loginScreen">
   <div class="box">
     <h2>iCmdr Login</h2>
     <input id="username" placeholder="Username">
     <input id="password" type="password" placeholder="Password">
-    <button onclick="doLogin()">Login</button>
+    <button onclick="login()">Login</button>
     <p id="error" style="color:#f87171;display:none">Invalid login</p>
   </div>
 </div>
 
-<!-- PORTAL -->
-<div class="screen" id="portal">
-  <div class="top">
-    <span>iCmdr Portal</span>
-    <button onclick="doLogout()" style="width:auto">Logout</button>
+<!-- HOME -->
+<div class="screen" id="homeScreen">
+  <div class="topbar">
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <strong>iCmdr Portal</strong>
   </div>
 
   <div class="box">
-    <button onclick="openMobile()">Open Mobile</button>
-    <button onclick="openResponder()">Open Responder</button>
+    <button onclick="goRoster()">Roster</button>
+    <button onclick="goResponder()">Responder</button>
   </div>
 </div>
 
@@ -90,40 +130,53 @@
     admin: "password123"
   };
 
-  function doLogin() {
+  let currentUser = "";
+
+  function login() {
     const u = document.getElementById("username").value;
     const p = document.getElementById("password").value;
     const err = document.getElementById("error");
 
     if (USERS[u] && USERS[u] === p) {
-      document.getElementById("loginScreen").style.display = "none";
-      document.getElementById("portal").style.display = "flex";
+      currentUser = u;
+      document.getElementById("profileName").innerText = "👤 " + u;
+      switchScreen("homeScreen");
       err.style.display = "none";
     } else {
       err.style.display = "block";
     }
   }
 
-  function doLogout() {
-    document.getElementById("portal").style.display = "none";
-    document.getElementById("loginScreen").style.display = "flex";
+  function logout() {
+    toggleMenu();
+    currentUser = "";
     document.getElementById("username").value = "";
     document.getElementById("password").value = "";
-    document.getElementById("error").style.display = "none";
+    switchScreen("loginScreen");
   }
 
-  function openMobile() {
-    window.open(
-      "https://icmdr.co/mobile.html?authKey=" + AUTH_KEY,
-      "_blank"
-    );
+  function toggleMenu() {
+    document.getElementById("menu").classList.toggle("open");
   }
 
-  function openResponder() {
-    window.open(
-      "https://icmdr.co/responder.html?authKey=" + AUTH_KEY,
-      "_blank"
-    );
+  function switchScreen(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  function showProfile() {
+    alert("Logged in as: " + currentUser);
+    toggleMenu();
+  }
+
+  function goRoster() {
+    window.location.href =
+      "https://icmdr.co/mobile.html?authKey=" + AUTH_KEY;
+  }
+
+  function goResponder() {
+    window.location.href =
+      "https://icmdr.co/responder.html?authKey=" + AUTH_KEY;
   }
 </script>
 

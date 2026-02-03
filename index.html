@@ -79,15 +79,12 @@ input,select{
   border-radius:8px;
   margin-bottom:10px;
 }
-.delete-btn{
-  background:var(--danger);
-}
+.delete-btn{background:var(--danger);}
 .shift{
   background:#1e293b;
-  padding:6px;
-  border-radius:4px;
-  margin-top:4px;
-  font-size:13px;
+  padding:8px;
+  border-radius:6px;
+  margin-bottom:6px;
 }
 </style>
 </head>
@@ -127,9 +124,10 @@ input,select{
     <p><strong>Name:</strong> <span id="pName"></span></p>
     <p><strong>Username:</strong> <span id="pUser"></span></p>
     <p><strong>Rank:</strong> <span id="pRank"></span></p>
+    <p><strong>Group:</strong> <span id="pGroup"></span></p>
     <p><strong>Member #:</strong> <span id="pNum"></span></p>
 
-    <h3>This Month Roster (POC)</h3>
+    <h3>My Availability</h3>
     <div id="profileRoster"></div>
   </div>
 
@@ -150,6 +148,7 @@ input,select{
       <input id="addPassword" placeholder="Password">
       <input id="addNumber" placeholder="Member number">
       <select id="addRank"></select>
+      <select id="addGroup"></select>
       <button onclick="createUser()">Create Member</button>
       <hr>
     </div>
@@ -162,12 +161,29 @@ input,select{
 <script>
 const SHIFTS=["Tue-D","Tue-N","Wed-D","Wed-N","Thu-D","Thu-N","Fri-D","Fri-N","Sat-D","Sat-N"];
 
-const RANK_RULES={
-  "Section Leader":["Member","Section Leader"],
-  "Deputy Controller":["Member","Section Leader"],
-  "Controller":["Member","Section Leader","Deputy Controller"],
-  "Staff":["Member","Section Leader","Deputy Controller","Controller"],
-  "Super Admin":["Member","Section Leader","Deputy Controller","Controller","Staff","Super Admin"]
+const RANKS=[
+  "Unit Member",
+  "Section Leader",
+  "Deputy Controller",
+  "Controller",
+  "Staff",
+  "Super Admin"
+];
+
+const GROUPS=[
+  "Probation",
+  "Member Operational",
+  "UDO",
+  "Life Member",
+  "Ops Officer"
+];
+
+const GROUP_ASSIGN={
+  "Section Leader":["Probation","Member Operational","UDO"],
+  "Deputy Controller":GROUPS,
+  "Controller":GROUPS,
+  "Staff":GROUPS,
+  "Super Admin":GROUPS
 };
 
 const DELETE_ALLOWED=["Controller","Staff","Super Admin"];
@@ -178,6 +194,7 @@ let users=JSON.parse(localStorage.getItem("users"))||{
     name:"Aaron Robbins",
     pass:"admin",
     rank:"Super Admin",
+    group:"Member Operational",
     num:"33",
     roster:{}
   }
@@ -199,20 +216,20 @@ function openScreen(id){
 function login(){
   const u=loginUser.value,p=loginPass.value;
   const user=Object.values(users).find(x=>x.username===u&&x.pass===p);
-  if(user){
-    currentUser=user.username;
-    menuUser.innerText=`${user.num} ${user.name}`;
-    pName.innerText=user.name;
-    pUser.innerText=user.username;
-    pRank.innerText=user.rank;
-    pNum.innerText=user.num;
-    loginScreen.style.display="none";
-    app.style.display="block";
-    if(user.rank!=="Member"){
-      adminMenu.innerHTML='<button onclick="openScreen(`admin`)">Admin</button>';
-    } else adminMenu.innerHTML="";
-    renderProfileRoster();
-  } else loginErr.style.display="block";
+  if(!user){loginErr.style.display="block";return;}
+  currentUser=user.username;
+  menuUser.innerText=`${user.num} ${user.name}`;
+  pName.innerText=user.name;
+  pUser.innerText=user.username;
+  pRank.innerText=user.rank;
+  pGroup.innerText=user.group;
+  pNum.innerText=user.num;
+  loginScreen.style.display="none";
+  app.style.display="block";
+  if(user.rank!=="Unit Member"){
+    adminMenu.innerHTML='<button onclick="openScreen(`admin`)">Admin</button>';
+  } else adminMenu.innerHTML="";
+  renderProfileRoster();
 }
 
 function logout(){
@@ -225,36 +242,59 @@ function logout(){
 function renderProfileRoster(){
   profileRoster.innerHTML="";
   SHIFTS.forEach(s=>{
-    profileRoster.innerHTML+=`<div class="shift">${s}: ${users[currentUser].roster[s]||"—"}</div>`;
+    const v=users[currentUser].roster[s]||"";
+    profileRoster.innerHTML+=`
+      <div class="shift">
+        <strong>${s}</strong>
+        <select onchange="updateMyRoster('${s}',this.value)">
+          <option value="">—</option>
+          <option ${v==="YES"?"selected":""}>YES</option>
+          <option ${v==="RCR"?"selected":""}>RCR</option>
+          <option ${v==="NA"?"selected":""}>NA</option>
+        </select>
+      </div>`;
   });
+}
+
+function updateMyRoster(shift,val){
+  users[currentUser].roster[shift]=val;
+  save();
 }
 
 function renderRoster(){
   rosterView.innerHTML="";
-  Object.values(users).forEach(u=>{
-    rosterView.innerHTML+=`
-      <div class="member">
-        <strong>${u.num} ${u.name}</strong> (${u.rank})
-      </div>`;
+  SHIFTS.forEach(s=>{
+    rosterView.innerHTML+=`<h3>${s}</h3>`;
+    Object.values(users).forEach(u=>{
+      const v=u.roster[s];
+      if(v && v!=="NA"){
+        rosterView.innerHTML+=`
+          <div class="member">
+            <strong>${u.num} ${u.name}</strong> (${u.group}) – ${v}
+          </div>`;
+      }
+    });
   });
 }
 
 function renderAdmin(){
   const me=users[currentUser];
   memberList.innerHTML="";
-  const canAdd=me.rank!=="Member"&&me.rank!=="Section Leader";
+  const canAdd=me.rank!=="Unit Member"&&me.rank!=="Section Leader";
   createBox.style.display=canAdd?"block":"none";
+
   if(canAdd){
     addRank.innerHTML="";
-    (RANK_RULES[me.rank]||[]).forEach(r=>addRank.innerHTML+=`<option>${r}</option>`);
+    RANKS.forEach(r=>addRank.innerHTML+=`<option>${r}</option>`);
+    addGroup.innerHTML="";
+    (GROUP_ASSIGN[me.rank]||[]).forEach(g=>addGroup.innerHTML+=`<option>${g}</option>`);
   }
 
   Object.values(users).forEach(u=>{
     memberList.innerHTML+=`
       <div class="member">
         <strong>${u.num} ${u.name}</strong><br>
-        Username: ${u.username}<br>
-        Rank: ${u.rank}<br>
+        ${u.rank} / ${u.group}<br>
         ${me.rank==="Section Leader"?"":`<button onclick="editUser('${u.username}')">Edit</button>`}
         ${DELETE_ALLOWED.includes(me.rank)&&u.username!==currentUser?`<button class="delete-btn" onclick="deleteUser('${u.username}')">Delete</button>`:""}
       </div>`;
@@ -264,8 +304,7 @@ function renderAdmin(){
 function editUser(username){
   const me=users[currentUser];
   const u=users[username];
-  const allowed=RANK_RULES[me.rank]||[];
-  const allowRankEdit = me.rank==="Super Admin" || username!==currentUser;
+  const canEditOwnRank = me.rank==="Super Admin" || username!==currentUser;
 
   memberList.innerHTML=`
     <div class="member">
@@ -274,25 +313,29 @@ function editUser(username){
       Username <input id="eUser" value="${u.username}">
       Password <input id="ePass" value="${u.pass}">
       Rank
-      <select id="eRank" ${allowRankEdit?"":"disabled"}>
-        ${allowed.map(r=>`<option ${u.rank===r?"selected":""}>${r}</option>`).join("")}
+      <select id="eRank" ${canEditOwnRank?"":"disabled"}>
+        ${RANKS.map(r=>`<option ${u.rank===r?"selected":""}>${r}</option>`).join("")}
+      </select>
+      Group
+      <select id="eGroup">
+        ${(GROUP_ASSIGN[me.rank]||[]).map(g=>`<option ${u.group===g?"selected":""}>${g}</option>`).join("")}
       </select>
       <button onclick="saveEdit('${username}')">Save</button>
     </div>`;
 }
 
-function saveEdit(originalKey){
-  const newUser=document.getElementById("eUser").value.trim();
-  const updated={
+function saveEdit(oldKey){
+  const newUser=eUser.value.trim();
+  users[newUser]={
     username:newUser,
     name:eName.value,
-    num:eNum.value,
     pass:ePass.value,
     rank:eRank.value,
-    roster:users[originalKey].roster||{}
+    group:eGroup.value,
+    num:eNum.value,
+    roster:users[oldKey].roster||{}
   };
-  delete users[originalKey];
-  users[newUser]=updated;
+  if(newUser!==oldKey) delete users[oldKey];
   save();
   renderAdmin();
 }
@@ -305,13 +348,13 @@ function deleteUser(username){
 }
 
 function createUser(){
-  if(!addUsername.value)return alert("Username required");
-  if(users[addUsername.value])return alert("Username exists");
+  if(!addUsername.value||users[addUsername.value])return alert("Invalid username");
   users[addUsername.value]={
     username:addUsername.value,
     name:addName.value,
     pass:addPassword.value,
     rank:addRank.value,
+    group:addGroup.value,
     num:addNumber.value,
     roster:{}
   };

@@ -1,183 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>iCmdr Portal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-    }
+<meta charset="UTF-8">
+<title>iCmdr Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    .screen {
-      height: 100vh;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+}
 
-    .screen.active {
-      display: flex;
-    }
+/* TOP BAR */
+.topbar {
+  height: 50px;
+  background: #020617;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+}
 
-    .box {
-      background: #020617;
-      padding: 30px;
-      border-radius: 8px;
-      width: 320px;
-      text-align: center;
-    }
+.hamburger {
+  font-size: 24px;
+  cursor: pointer;
+  margin-right: 15px;
+}
 
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 4px;
-      border: none;
-    }
+.title {
+  font-weight: bold;
+}
 
-    button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 12px;
-      background: #2563eb;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
+/* MENU */
+.menu {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 260px;
+  height: 100%;
+  background: #020617;
+  padding: 20px;
+  transition: 0.3s;
+  z-index: 1000;
+}
 
-    /* TOP BAR */
-    .topbar {
-      width: 100%;
-      background: #020617;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-    }
+.menu.open {
+  left: 0;
+}
 
-    .hamburger {
-      font-size: 24px;
-      cursor: pointer;
-      margin-right: 15px;
-    }
+.menu button {
+  width: 100%;
+  margin-top: 10px;
+}
 
-    /* MENU */
-    .menu {
-      position: fixed;
-      top: 0;
-      left: -260px;
-      width: 260px;
-      height: 100%;
-      background: #020617;
-      padding: 20px;
-      transition: 0.3s;
-      z-index: 1000;
-    }
+/* SCREENS */
+.screen {
+  display: none;
+  padding: 20px;
+}
 
-    .menu.open {
-      left: 0;
-    }
+.screen.active {
+  display: block;
+}
 
-    .menu button {
-      margin-top: 10px;
-    }
-  </style>
+/* LOGIN */
+.login {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.box {
+  background: #020617;
+  padding: 25px;
+  border-radius: 8px;
+  width: 320px;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 4px;
+  border: none;
+}
+
+button {
+  padding: 10px;
+  margin-top: 10px;
+  background: #2563eb;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* PROFILE */
+.profile-pic {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #1e293b;
+  margin: 10px auto;
+  background-size: cover;
+  background-position: center;
+}
+
+/* ROSTER */
+.week {
+  background: #020617;
+  padding: 15px;
+  border-radius: 6px;
+  margin-top: 15px;
+}
+
+.day {
+  margin-top: 8px;
+  padding: 8px;
+  background: #1e293b;
+  border-radius: 4px;
+}
+</style>
 </head>
 
 <body>
 
-<!-- HAMBURGER MENU -->
+<!-- MENU -->
 <div class="menu" id="menu">
-  <h3 id="profileName">Profile</h3>
-  <button onclick="showProfile()">Profile</button>
+  <h3 id="menuUser">Profile</h3>
+  <button onclick="showScreen('profile')">Profile</button>
+  <button onclick="showScreen('roster')">Roster</button>
   <button onclick="logout()">Logout</button>
 </div>
 
 <!-- LOGIN -->
-<div class="screen active" id="loginScreen">
+<div class="login" id="loginScreen">
   <div class="box">
-    <h2>iCmdr Login</h2>
+    <h2>Login</h2>
     <input id="username" placeholder="Username">
     <input id="password" type="password" placeholder="Password">
     <button onclick="login()">Login</button>
-    <p id="error" style="color:#f87171;display:none">Invalid login</p>
+    <p id="loginError" style="color:#f87171;display:none">Invalid login</p>
   </div>
 </div>
 
-<!-- HOME -->
-<div class="screen" id="homeScreen">
+<!-- APP -->
+<div id="app" style="display:none">
+
   <div class="topbar">
     <div class="hamburger" onclick="toggleMenu()">☰</div>
-    <strong>iCmdr Portal</strong>
+    <div class="title">iCmdr Portal</div>
   </div>
 
-  <div class="box">
-    <button onclick="goRoster()">Roster</button>
-    <button onclick="goResponder()">Responder</button>
+  <!-- HOME -->
+  <div class="screen active" id="home">
+    <h2>Welcome</h2>
+    <p>Select an option from the menu.</p>
   </div>
+
+  <!-- PROFILE -->
+  <div class="screen" id="profile">
+    <h2>Profile</h2>
+
+    <div class="profile-pic" id="profilePic"></div>
+    <input type="file" accept="image/*" onchange="uploadPhoto(event)">
+
+    <p><strong>Username:</strong> <span id="profileUser"></span></p>
+
+    <h3>Change Password</h3>
+    <input id="newPassword" type="password" placeholder="New password">
+    <button onclick="changePassword()">Update Password</button>
+
+    <h3>Monthly Availability</h3>
+    <select id="daySelect">
+      <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+      <option>Thursday</option><option>Friday</option>
+      <option>Saturday</option><option>Sunday</option>
+    </select>
+    <input id="availability" placeholder="Available / Unavailable / Night only">
+    <button onclick="saveAvailability()">Save</button>
+  </div>
+
+  <!-- ROSTER -->
+  <div class="screen" id="roster">
+    <h2>Roster</h2>
+    <div id="rosterOutput"></div>
+  </div>
+
 </div>
 
 <script>
-  const AUTH_KEY = "C388C75F-3BBB-4081-919C-A6D00D46379F";
+let users = JSON.parse(localStorage.getItem("users")) || {
+  admin: { password: "password123", roster: {}, photo: "" }
+};
 
-  const USERS = {
-    admin: "password123"
+let currentUser = "";
+
+function toggleMenu() {
+  document.getElementById("menu").classList.toggle("open");
+}
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  toggleMenu();
+  if (id === "roster") renderRoster();
+}
+
+function login() {
+  const u = username.value;
+  const p = password.value;
+
+  if (users[u] && users[u].password === p) {
+    currentUser = u;
+    document.getElementById("menuUser").innerText = "👤 " + u;
+    document.getElementById("profileUser").innerText = u;
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    loadProfile();
+  } else {
+    loginError.style.display = "block";
+  }
+}
+
+function logout() {
+  currentUser = "";
+  document.getElementById("app").style.display = "none";
+  document.getElementById("loginScreen").style.display = "flex";
+  toggleMenu();
+}
+
+function changePassword() {
+  users[currentUser].password = newPassword.value;
+  save();
+  alert("Password updated");
+}
+
+function uploadPhoto(e) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    users[currentUser].photo = reader.result;
+    document.getElementById("profilePic").style.backgroundImage =
+      `url(${reader.result})`;
+    save();
   };
+  reader.readAsDataURL(e.target.files[0]);
+}
 
-  let currentUser = "";
+function saveAvailability() {
+  users[currentUser].roster[daySelect.value] = availability.value;
+  save();
+  alert("Saved");
+}
 
-  function login() {
-    const u = document.getElementById("username").value;
-    const p = document.getElementById("password").value;
-    const err = document.getElementById("error");
-
-    if (USERS[u] && USERS[u] === p) {
-      currentUser = u;
-      document.getElementById("profileName").innerText = "👤 " + u;
-      switchScreen("homeScreen");
-      err.style.display = "none";
-    } else {
-      err.style.display = "block";
-    }
+function renderRoster() {
+  const out = document.getElementById("rosterOutput");
+  out.innerHTML = "";
+  for (const day in users[currentUser].roster) {
+    out.innerHTML += `
+      <div class="day">
+        <strong>${day}</strong>: ${users[currentUser].roster[day]}
+      </div>`;
   }
+}
 
-  function logout() {
-    toggleMenu();
-    currentUser = "";
-    document.getElementById("username").value = "";
-    document.getElementById("password").value = "";
-    switchScreen("loginScreen");
+function loadProfile() {
+  if (users[currentUser].photo) {
+    document.getElementById("profilePic").style.backgroundImage =
+      `url(${users[currentUser].photo})`;
   }
+}
 
-  function toggleMenu() {
-    document.getElementById("menu").classList.toggle("open");
-  }
-
-  function switchScreen(id) {
-    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-  }
-
-  function showProfile() {
-    alert("Logged in as: " + currentUser);
-    toggleMenu();
-  }
-
-  function goRoster() {
-    window.location.href =
-      "https://icmdr.co/mobile.html?authKey=" + AUTH_KEY;
-  }
-
-  function goResponder() {
-    window.location.href =
-      "https://icmdr.co/responder.html?authKey=" + AUTH_KEY;
-  }
+function save() {
+  localStorage.setItem("users", JSON.stringify(users));
+}
 </script>
 
 </body>

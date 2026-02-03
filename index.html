@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>iCmdr Access Portal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <title>iCmdr Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
       margin: 0;
@@ -12,26 +11,19 @@
       background: #0f172a;
       color: white;
     }
-
-    /* LOGIN */
-    .login {
+    .login, .portal {
       height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
     }
-
-    .login-box {
+    .box {
       background: #020617;
       padding: 30px;
       border-radius: 8px;
       width: 320px;
-    }
-
-    .login-box h2 {
       text-align: center;
     }
-
     input {
       width: 100%;
       padding: 10px;
@@ -39,11 +31,10 @@
       border-radius: 4px;
       border: none;
     }
-
     button {
       width: 100%;
-      margin-top: 15px;
-      padding: 10px;
+      padding: 12px;
+      margin-top: 12px;
       background: #2563eb;
       border: none;
       border-radius: 4px;
@@ -51,61 +42,74 @@
       font-weight: bold;
       cursor: pointer;
     }
-
-    .error {
-      color: #f87171;
-      margin-top: 10px;
-      text-align: center;
+    .portal {
       display: none;
-    }
-
-    /* APP */
-    .app {
-      display: none;
-      height: 100vh;
       flex-direction: column;
     }
-
-    /* TOP BAR */
-    .topbar {
-      height: 50px;
+    .top {
       background: #020617;
+      padding: 10px;
+      width: 100%;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      padding: 0 15px;
     }
+  </style>
+</head>
 
-    .hamburger {
-      font-size: 24px;
-      cursor: pointer;
-      margin-right: 15px;
+<body>
+
+<div class="login" id="login">
+  <div class="box">
+    <h2>iCmdr Login</h2>
+    <input id="user" placeholder="Username">
+    <input id="pass" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p id="err" style="color:#f87171;display:none">Invalid login</p>
+  </div>
+</div>
+
+<div class="portal" id="portal">
+  <div class="top">
+    <span>iCmdr Portal</span>
+    <button onclick="logout()" style="width:auto">Logout</button>
+  </div>
+
+  <div class="box">
+    <button onclick="openMobile()">Open Mobile</button>
+    <button onclick="openResponder()">Open Responder</button>
+  </div>
+</div>
+
+<script>
+  const KEY = "C388C75F-3BBB-4081-919C-A6D00D46379F";
+  const USERS = { admin: "password123" };
+
+  function login() {
+    if (USERS[user.value] === pass.value) {
+      login.style.display = "none";
+      portal.style.display = "flex";
+    } else {
+      err.style.display = "block";
     }
+  }
 
-    .title {
-      flex: 1;
-      font-weight: bold;
-    }
+  function logout() {
+    portal.style.display = "none";
+    login.style.display = "flex";
+    user.value = "";
+    pass.value = "";
+    err.style.display = "none";
+  }
 
-    /* SIDE MENU */
-    .menu {
-      position: fixed;
-      top: 0;
-      left: -260px;
-      width: 260px;
-      height: 100%;
-      background: #020617;
-      padding: 20px;
-      transition: 0.3s;
-      z-index: 1000;
-    }
+  function openMobile() {
+    window.open(`https://icmdr.co/mobile.html?authKey=${KEY}`, "_blank");
+  }
 
-    .menu.open {
-      left: 0;
-    }
+  function openResponder() {
+    window.open(`https://icmdr.co/responder.html?authKey=${KEY}`, "_blank");
+  }
+</script>
 
-    .menu h3 {
-      margin-top: 0;
-    }
-
-    .menu button {
-      width:
+</body>
+</html>

@@ -63,10 +63,10 @@
 <div class="screen" id="loginScreen">
   <div class="box">
     <h2>iCmdr Login</h2>
-    <input id="user" placeholder="Username">
-    <input id="pass" type="password" placeholder="Password">
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
     <button onclick="doLogin()">Login</button>
-    <p id="err" style="color:#f87171;display:none">Invalid login</p>
+    <p id="error" style="color:#f87171;display:none">Invalid login</p>
   </div>
 </div>
 
@@ -85,10 +85,17 @@
 
 <script>
   const AUTH_KEY = "C388C75F-3BBB-4081-919C-A6D00D46379F";
-  const USERS = { admin: "password123" };
+
+  const USERS = {
+    admin: "password123"
+  };
 
   function doLogin() {
-    if (USERS[user.value] === pass.value) {
+    const u = document.getElementById("username").value;
+    const p = document.getElementById("password").value;
+    const err = document.getElementById("error");
+
+    if (USERS[u] && USERS[u] === p) {
       document.getElementById("loginScreen").style.display = "none";
       document.getElementById("portal").style.display = "flex";
       err.style.display = "none";
@@ -100,11 +107,25 @@
   function doLogout() {
     document.getElementById("portal").style.display = "none";
     document.getElementById("loginScreen").style.display = "flex";
-    user.value = "";
-    pass.value = "";
-    err.style.display = "none";
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("error").style.display = "none";
   }
 
   function openMobile() {
     window.open(
-      `https://icmdr.co/mobile.htm
+      "https://icmdr.co/mobile.html?authKey=" + AUTH_KEY,
+      "_blank"
+    );
+  }
+
+  function openResponder() {
+    window.open(
+      "https://icmdr.co/responder.html?authKey=" + AUTH_KEY,
+      "_blank"
+    );
+  }
+</script>
+
+</body>
+</html>

@@ -1,3 +1,57 @@
+/* ---------------- VEHICLES ---------------- */
+
+const vehicles = [
+
+{ name:"Rescue 1", location:"Morwell", status:"Online" },
+{ name:"Rescue 2", location:"Morwell", status:"Online" },
+{ name:"Support 1", location:"Morwell", status:"Online" },
+{ name:"Support 2", location:"Morwell", status:"Online" },
+{ name:"RB 521", location:"Morwell", status:"Online" },
+{ name:"RB 522", location:"Morwell", status:"Online" },
+{ name:"Storm Trailer", location:"Morwell", status:"Online" },
+{ name:"RCR Trailer", location:"Morwell", status:"Online" }
+
+];
+
+function renderVehicles(){
+
+const table=document.querySelector(".vehicleTable");
+
+let rows=`
+<tr>
+<th>Vehicle</th>
+<th>Location</th>
+<th>Status</th>
+<th>Available</th>
+</tr>
+`;
+
+vehicles.forEach(v=>{
+
+let dot="green";
+
+if(v.status==="Offline") dot="red";
+if(v.status==="Training") dot="yellow";
+if(v.status==="Service") dot="gray";
+
+rows+=`
+<tr>
+<td>${v.name}</td>
+<td>${v.location}</td>
+<td>${v.status}</td>
+<td><span class="dot ${dot}"></span></td>
+</tr>
+`;
+
+});
+
+table.innerHTML=rows;
+
+}
+
+
+/* ---------------- SHIFT SYSTEM ---------------- */
+
 const SHIFTS=[
 "Tue-D","Tue-N",
 "Wed-D","Wed-N",
@@ -5,6 +59,9 @@ const SHIFTS=[
 "Fri-D","Fri-N",
 "Sat-D","Sat-N"
 ];
+
+
+/* ---------------- RANKS ---------------- */
 
 const RANKS=[
 "Unit Member",
@@ -31,6 +88,9 @@ const ADMIN_RANKS=[
 "Super Admin"
 ];
 
+
+/* ---------------- USERS ---------------- */
+
 let users = JSON.parse(localStorage.getItem("users")) || {
 
 admin:{
@@ -47,11 +107,17 @@ roster:{}
 
 let currentUser = localStorage.getItem("session") || "";
 
+
+/* ---------------- SAVE ---------------- */
+
 function save(){
 
 localStorage.setItem("users",JSON.stringify(users));
 
 }
+
+
+/* ---------------- NAVIGATION ---------------- */
 
 function openScreen(id){
 
@@ -65,7 +131,12 @@ if(id==="availability") renderAvailability();
 
 if(id==="roster") renderRoster();
 
+if(id==="vehicles") renderVehicles();
+
 }
+
+
+/* ---------------- LOGIN ---------------- */
 
 function login(){
 
@@ -89,6 +160,7 @@ initApp();
 
 }
 
+
 function initApp(){
 
 const user=users[currentUser];
@@ -103,6 +175,9 @@ renderDashboard();
 
 }
 
+
+/* ---------------- LOGOUT ---------------- */
+
 function logout(){
 
 currentUser="";
@@ -112,6 +187,9 @@ localStorage.removeItem("session");
 location.reload();
 
 }
+
+
+/* ---------------- DASHBOARD ---------------- */
 
 function renderDashboard(){
 
@@ -131,9 +209,12 @@ dashMembers.innerText=available;
 
 dashUDO.innerText="TBA";
 
-dashVehicles.innerText="6";
+dashVehicles.innerText=vehicles.length;
 
 }
+
+
+/* ---------------- AVAILABILITY ---------------- */
 
 function renderAvailability(){
 
@@ -169,6 +250,7 @@ availabilityGrid.innerHTML+=`
 
 }
 
+
 function updateMyRoster(shift,val){
 
 users[currentUser].roster[shift]=val;
@@ -176,6 +258,9 @@ users[currentUser].roster[shift]=val;
 save();
 
 }
+
+
+/* ---------------- ROSTER ---------------- */
 
 function renderRoster(){
 
@@ -206,6 +291,9 @@ rosterView.innerHTML+=`
 });
 
 }
+
+
+/* ---------------- UMT ---------------- */
 
 function openUMT(section){
 
@@ -251,6 +339,9 @@ content.innerHTML=`<h3>Unit Announcements</h3><p>Create announcements for member
 
 }
 
+
+/* ---------------- MEMBER ADMIN ---------------- */
+
 function renderAdmin(){
 
 addRank.innerHTML="";
@@ -278,6 +369,9 @@ ${u.rank} / ${u.group}
 });
 
 }
+
+
+/* ---------------- CREATE USER ---------------- */
 
 function createUser(){
 
@@ -312,6 +406,9 @@ save();
 renderAdmin();
 
 }
+
+
+/* ---------------- AUTO LOGIN ---------------- */
 
 if(currentUser && users[currentUser]){
 

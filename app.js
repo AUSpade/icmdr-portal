@@ -26,6 +26,7 @@ const ADMIN_RANKS=[
 ];
 
 let users=JSON.parse(localStorage.getItem("users"))||{
+
 admin:{
 username:"admin",
 name:"Aaron Robbins",
@@ -35,16 +36,15 @@ group:"Member Operational",
 num:"33",
 roster:{}
 }
+
 };
 
 let currentUser=localStorage.getItem("session")||"";
 
 function save(){
-localStorage.setItem("users",JSON.stringify(users));
-}
 
-function toggleMenu(){
-menu.classList.toggle("open");
+localStorage.setItem("users",JSON.stringify(users));
+
 }
 
 function openScreen(id){
@@ -53,11 +53,13 @@ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
 
 document.getElementById(id).classList.add("active");
 
-menu.classList.remove("open");
+if(id==="roster")renderRoster();
+
+if(id==="availability")renderAvailability();
 
 if(id==="umt")renderAdmin();
 
-if(id==="roster")renderRoster();
+if(id==="dashboard")renderDashboard();
 
 }
 
@@ -71,7 +73,6 @@ const user=Object.values(users).find(x=>x.username===u&&x.pass===p);
 if(!user){
 
 loginErr.style.display="block";
-
 return;
 
 }
@@ -90,27 +91,17 @@ const user=users[currentUser];
 
 menuUser.innerText=`${user.num} ${user.name}`;
 
-pName.innerText=user.name;
-
-pUser.innerText=user.username;
-
-pRank.innerText=user.rank;
-
-pGroup.innerText=user.group;
-
-pNum.innerText=user.num;
-
 loginScreen.style.display="none";
 
 app.style.display="block";
 
-if(ADMIN_RANKS.includes(user.rank)){
+if(!ADMIN_RANKS.includes(user.rank)){
 
-adminMenu.innerHTML='<button onclick="openScreen(`umt`)">UMT</button>';
+umtButton.style.display="none";
 
 }
 
-renderProfileRoster();
+renderDashboard();
 
 }
 
@@ -120,21 +111,39 @@ currentUser="";
 
 localStorage.removeItem("session");
 
-app.style.display="none";
-
-loginScreen.style.display="flex";
+location.reload();
 
 }
 
-function renderProfileRoster(){
+function renderDashboard(){
 
-profileRoster.innerHTML="";
+let available=0;
+
+Object.values(users).forEach(u=>{
+
+Object.values(u.roster).forEach(v=>{
+
+if(v==="YES") available++;
+
+});
+
+});
+
+dashMembers.innerText=available;
+
+dashUDO.innerText="TBA";
+
+}
+
+function renderAvailability(){
+
+availabilityGrid.innerHTML="";
 
 SHIFTS.forEach(s=>{
 
 const v=users[currentUser].roster[s]||"";
 
-profileRoster.innerHTML+=`
+availabilityGrid.innerHTML+=`
 <div class="shift">
 
 <strong>${s}</strong>
@@ -178,19 +187,18 @@ Object.values(users).forEach(u=>{
 
 const v=u.roster[s];
 
-if(!v||v==="NA")return;
+if(!v||v==="NA") return;
 
 let cls="";
 
-if(v==="YES")cls="yes";
+if(v==="YES") cls="yes";
 
-if(v==="RCR")cls="rcr";
+if(v==="RCR") cls="rcr";
 
 rosterView.innerHTML+=`
 <div class="member">
 
 <strong>${u.num} ${u.name}</strong> (${u.group})
-
 <span class="${cls}">${v}</span>
 
 </div>
@@ -204,16 +212,12 @@ rosterView.innerHTML+=`
 
 function renderAdmin(){
 
-const me=users[currentUser];
-
 memberList.innerHTML="";
 
 addRank.innerHTML="";
-
 RANKS.forEach(r=>addRank.innerHTML+=`<option>${r}</option>`);
 
 addGroup.innerHTML="";
-
 GROUPS.forEach(g=>addGroup.innerHTML+=`<option>${g}</option>`);
 
 Object.values(users).forEach(u=>{
@@ -223,13 +227,7 @@ memberList.innerHTML+=`
 
 <strong>${u.num} ${u.name}</strong><br>
 
-${u.rank} / ${u.group}<br>
-
-<button onclick="editUser('${u.username}')">Edit</button>
-
-${u.rank!=="Super Admin" && u.username!==currentUser ?
-
-`<button class="delete-btn" onclick="deleteUser('${u.username}')">Delete</button>`:""}
+${u.rank} / ${u.group}
 
 </div>
 `;
@@ -259,116 +257,14 @@ return;
 users[addUsername.value]={
 
 username:addUsername.value,
-
 name:addName.value,
-
 pass:addPassword.value,
-
 rank:addRank.value,
-
 group:addGroup.value,
-
 num:addNumber.value,
-
 roster:{}
 
 };
-
-save();
-
-renderAdmin();
-
-}
-
-function deleteUser(username){
-
-if(users[username].rank==="Super Admin"){
-
-alert("Cannot delete Super Admin");
-
-return;
-
-}
-
-if(!confirm("Delete this member?"))return;
-
-delete users[username];
-
-save();
-
-renderAdmin();
-
-}
-
-function editUser(username){
-
-const u=users[username];
-
-memberList.innerHTML=`
-<div class="member">
-
-Name <input id="eName" value="${u.name}">
-
-Member # <input id="eNum" value="${u.num}">
-
-Username <input id="eUser" value="${u.username}">
-
-Password <input id="ePass" value="${u.pass}">
-
-Rank
-
-<select id="eRank">
-
-${RANKS.map(r=>`<option ${u.rank===r?"selected":""}>${r}</option>`).join("")}
-
-</select>
-
-Group
-
-<select id="eGroup">
-
-${GROUPS.map(g=>`<option ${u.group===g?"selected":""}>${g}</option>`).join("")}
-
-</select>
-
-<button onclick="saveEdit('${username}')">Save</button>
-
-</div>
-`;
-
-}
-
-function saveEdit(oldKey){
-
-const newUser=eUser.value.trim();
-
-if(newUser!==oldKey && users[newUser]){
-
-alert("Username exists");
-
-return;
-
-}
-
-users[newUser]={
-
-username:newUser,
-
-name:eName.value,
-
-pass:ePass.value,
-
-rank:eRank.value,
-
-group:eGroup.value,
-
-num:eNum.value,
-
-roster:users[oldKey].roster||{}
-
-};
-
-if(newUser!==oldKey) delete users[oldKey];
 
 save();
 

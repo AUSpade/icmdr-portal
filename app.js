@@ -162,16 +162,20 @@ localStorage.setItem("users",JSON.stringify(users));
 
 function openScreen(id){
 
+const user = users[currentUser];
+
+if(id==="umt" && !hasPermission("UMT")){
+alert("You do not have permission to access UMT");
+return;
+}
+
 document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
 
 document.getElementById(id).classList.add("active");
 
 if(id==="dashboard") renderDashboard();
-
 if(id==="availability") renderAvailability();
-
 if(id==="roster") renderRoster();
-
 if(id==="vehicles") renderVehicles();
 
 }
@@ -438,9 +442,11 @@ username:addUsername.value,
 name:addName.value,
 pass:addPassword.value,
 rank:addRank.value,
+power:RANKS[addRank.value],
 group:addGroup.value,
 num:addNumber.value,
 roster:{}
+
 
 };
 

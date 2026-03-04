@@ -1,4 +1,10 @@
-const SHIFTS=["Tue-D","Tue-N","Wed-D","Wed-N","Thu-D","Thu-N","Fri-D","Fri-N","Sat-D","Sat-N"];
+const SHIFTS=[
+"Tue-D","Tue-N",
+"Wed-D","Wed-N",
+"Thu-D","Thu-N",
+"Fri-D","Fri-N",
+"Sat-D","Sat-N"
+];
 
 const RANKS=[
 "Unit Member",
@@ -25,7 +31,7 @@ const ADMIN_RANKS=[
 "Super Admin"
 ];
 
-let users=JSON.parse(localStorage.getItem("users"))||{
+let users = JSON.parse(localStorage.getItem("users")) || {
 
 admin:{
 username:"admin",
@@ -39,7 +45,7 @@ roster:{}
 
 };
 
-let currentUser=localStorage.getItem("session")||"";
+let currentUser = localStorage.getItem("session") || "";
 
 function save(){
 
@@ -53,13 +59,11 @@ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
 
 document.getElementById(id).classList.add("active");
 
-if(id==="roster")renderRoster();
+if(id==="dashboard") renderDashboard();
 
-if(id==="availability")renderAvailability();
+if(id==="availability") renderAvailability();
 
-if(id==="umt")renderAdmin();
-
-if(id==="dashboard")renderDashboard();
+if(id==="roster") renderRoster();
 
 }
 
@@ -68,7 +72,7 @@ function login(){
 const u=loginUser.value;
 const p=loginPass.value;
 
-const user=Object.values(users).find(x=>x.username===u&&x.pass===p);
+const user=Object.values(users).find(x=>x.username===u && x.pass===p);
 
 if(!user){
 
@@ -89,17 +93,11 @@ function initApp(){
 
 const user=users[currentUser];
 
-menuUser.innerText=`${user.num} ${user.name}`;
+menuUser.innerText=`Logged in as ${user.name}`;
 
 loginScreen.style.display="none";
 
 app.style.display="block";
-
-if(!ADMIN_RANKS.includes(user.rank)){
-
-umtButton.style.display="none";
-
-}
 
 renderDashboard();
 
@@ -133,6 +131,8 @@ dashMembers.innerText=available;
 
 dashUDO.innerText="TBA";
 
+dashVehicles.innerText="6";
+
 }
 
 function renderAvailability(){
@@ -144,6 +144,7 @@ SHIFTS.forEach(s=>{
 const v=users[currentUser].roster[s]||"";
 
 availabilityGrid.innerHTML+=`
+
 <div class="shift">
 
 <strong>${s}</strong>
@@ -161,6 +162,7 @@ availabilityGrid.innerHTML+=`
 </select>
 
 </div>
+
 `;
 
 });
@@ -189,19 +191,14 @@ const v=u.roster[s];
 
 if(!v||v==="NA") return;
 
-let cls="";
-
-if(v==="YES") cls="yes";
-
-if(v==="RCR") cls="rcr";
-
 rosterView.innerHTML+=`
+
 <div class="member">
 
-<strong>${u.num} ${u.name}</strong> (${u.group})
-<span class="${cls}">${v}</span>
+<strong>${u.num} ${u.name}</strong> (${u.group}) – ${v}
 
 </div>
+
 `;
 
 });
@@ -210,9 +207,51 @@ rosterView.innerHTML+=`
 
 }
 
-function renderAdmin(){
+function openUMT(section){
 
-memberList.innerHTML="";
+const content=document.getElementById("umtContent");
+
+if(section==="members"){
+
+content.innerHTML=`
+
+<h3>Member Management</h3>
+
+<input id="addName" placeholder="Full name">
+<input id="addUsername" placeholder="Username">
+<input id="addPassword" placeholder="Password">
+<input id="addNumber" placeholder="Member number">
+
+<select id="addRank"></select>
+<select id="addGroup"></select>
+
+<button onclick="createUser()">Create Member</button>
+
+<hr>
+
+<div id="memberList"></div>
+
+`;
+
+renderAdmin();
+
+}
+
+if(section==="calendar"){
+
+content.innerHTML=`<h3>Unit Calendar</h3><p>Calendar system coming soon.</p>`;
+
+}
+
+if(section==="announcements"){
+
+content.innerHTML=`<h3>Unit Announcements</h3><p>Create announcements for members.</p>`;
+
+}
+
+}
+
+function renderAdmin(){
 
 addRank.innerHTML="";
 RANKS.forEach(r=>addRank.innerHTML+=`<option>${r}</option>`);
@@ -220,9 +259,12 @@ RANKS.forEach(r=>addRank.innerHTML+=`<option>${r}</option>`);
 addGroup.innerHTML="";
 GROUPS.forEach(g=>addGroup.innerHTML+=`<option>${g}</option>`);
 
+memberList.innerHTML="";
+
 Object.values(users).forEach(u=>{
 
 memberList.innerHTML+=`
+
 <div class="member">
 
 <strong>${u.num} ${u.name}</strong><br>
@@ -230,6 +272,7 @@ memberList.innerHTML+=`
 ${u.rank} / ${u.group}
 
 </div>
+
 `;
 
 });
@@ -241,7 +284,6 @@ function createUser(){
 if(!addUsername.value){
 
 alert("Username required");
-
 return;
 
 }
@@ -249,7 +291,6 @@ return;
 if(users[addUsername.value]){
 
 alert("Username exists");
-
 return;
 
 }

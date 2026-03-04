@@ -84,7 +84,55 @@ saveVehicles();
 
 renderVehicles();
 
-renderDashboard();
+function renderDashboard(){
+
+let available=0;
+
+Object.values(users).forEach(u=>{
+
+Object.values(u.roster).forEach(v=>{
+
+if(v==="YES") available++;
+
+});
+
+});
+
+dashMembers.innerText=available;
+
+dashUDO.innerText="TBA";
+
+/* vehicles ready */
+
+let ready=vehicles.filter(v=>v.status==="Online").length;
+
+dashVehicles.innerText=ready;
+
+/* vehicle table */
+
+const table=document.getElementById("dashboardVehicles");
+
+let rows=`
+<tr>
+<th>Vehicle</th>
+<th>Status</th>
+<th>Location</th>
+</tr>
+`;
+
+vehicles.forEach(v=>{
+
+rows+=`
+<tr>
+<td>${v.name}</td>
+<td>${v.status}</td>
+<td>${v.location}</td>
+</tr>
+`;
+
+});
+
+table.innerHTML=rows;
 
 }
 

@@ -138,6 +138,7 @@ username:"admin",
 name:"Aaron Robbins",
 pass:"admin",
 rank:"Super Admin",
+power:100,
 group:"Member Operational",
 num:"33",
 roster:{}

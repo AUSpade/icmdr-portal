@@ -7,361 +7,479 @@
 
 <style>
 :root{
-  --bg:#0b1220;
-  --panel:#111827;
-  --panel2:#1f2937;
-  --accent:#3b82f6;
-  --danger:#dc2626;
-  --text:#e5e7eb;
+--bg:#0b1220;
+--panel:#111827;
+--panel2:#1f2937;
+--accent:#3b82f6;
+--danger:#dc2626;
+--text:#e5e7eb;
 }
+
 body{
-  margin:0;
-  font-family:system-ui,-apple-system;
-  background:var(--bg);
-  color:var(--text);
+margin:0;
+font-family:system-ui;
+background:var(--bg);
+color:var(--text);
 }
+
 .login{
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
 }
+
 .card{
-  background:var(--panel);
-  padding:24px;
-  border-radius:12px;
-  width:320px;
+background:var(--panel);
+padding:24px;
+border-radius:12px;
+width:320px;
 }
+
 .topbar{
-  height:52px;
-  background:var(--panel);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:0 16px;
+height:52px;
+background:var(--panel);
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 16px;
 }
+
 .hamburger{
-  font-size:26px;
-  cursor:pointer;
+font-size:26px;
+cursor:pointer;
 }
+
 .menu{
-  position:fixed;
-  top:52px;
-  right:-260px;
-  width:260px;
-  height:calc(100% - 52px);
-  background:var(--panel2);
-  padding:16px;
-  transition:.25s;
+position:fixed;
+top:52px;
+right:-260px;
+width:260px;
+height:calc(100% - 52px);
+background:var(--panel2);
+padding:16px;
+transition:.25s;
 }
+
 .menu.open{right:0;}
+
 .menu button{
-  width:100%;
-  margin-top:8px;
-  padding:10px;
-  background:var(--accent);
-  border:none;
-  border-radius:6px;
-  color:white;
+width:100%;
+margin-top:8px;
+padding:10px;
+background:var(--accent);
+border:none;
+border-radius:6px;
+color:white;
 }
+
 .screen{display:none;padding:16px;}
 .screen.active{display:block;}
+
 input,select{
-  width:100%;
-  padding:10px;
-  margin-top:8px;
-  border-radius:6px;
-  border:none;
+width:100%;
+padding:10px;
+margin-top:8px;
+border-radius:6px;
+border:none;
 }
+
 .member{
-  background:var(--panel2);
-  padding:12px;
-  border-radius:8px;
-  margin-bottom:10px;
+background:var(--panel2);
+padding:12px;
+border-radius:8px;
+margin-bottom:10px;
 }
+
 .delete-btn{background:var(--danger);}
+
 .shift{
-  background:#1e293b;
-  padding:8px;
-  border-radius:6px;
-  margin-bottom:6px;
+background:#1e293b;
+padding:8px;
+border-radius:6px;
+margin-bottom:6px;
 }
+
+.yes{color:#22c55e}
+.rcr{color:#eab308}
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
 <div class="login" id="loginScreen">
-  <div class="card">
-    <h2>Login</h2>
-    <input id="loginUser" placeholder="Username">
-    <input id="loginPass" type="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <p id="loginErr" style="color:#f87171;display:none">Invalid login</p>
-  </div>
+<div class="card">
+<h2>Login</h2>
+<input id="loginUser" placeholder="Username">
+<input id="loginPass" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p id="loginErr" style="color:#f87171;display:none">Invalid login</p>
+</div>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none">
 
-  <div class="topbar">
-    <strong>iCmdr – Morwell (POC)</strong>
-    <div class="hamburger" onclick="toggleMenu()">☰</div>
-  </div>
+<div class="topbar">
+<strong>iCmdr – Morwell (POC)</strong>
+<div class="hamburger" onclick="toggleMenu()">☰</div>
+</div>
 
-  <div class="menu" id="menu">
-    <h3 id="menuUser"></h3>
-    <button onclick="openScreen('profile')">Profile</button>
-    <button onclick="openScreen('roster')">Roster</button>
-    <div id="adminMenu"></div>
-    <button onclick="logout()">Logout</button>
-  </div>
+<div class="menu" id="menu">
+<h3 id="menuUser"></h3>
+<button onclick="openScreen('profile')">Profile</button>
+<button onclick="openScreen('roster')">Roster</button>
+<div id="adminMenu"></div>
+<button onclick="logout()">Logout</button>
+</div>
 
-  <!-- PROFILE -->
-  <div class="screen active" id="profile">
-    <h2>Profile</h2>
-    <p><strong>Name:</strong> <span id="pName"></span></p>
-    <p><strong>Username:</strong> <span id="pUser"></span></p>
-    <p><strong>Rank:</strong> <span id="pRank"></span></p>
-    <p><strong>Group:</strong> <span id="pGroup"></span></p>
-    <p><strong>Member #:</strong> <span id="pNum"></span></p>
+<div class="screen active" id="profile">
+<h2>Profile</h2>
+<p><strong>Name:</strong> <span id="pName"></span></p>
+<p><strong>Username:</strong> <span id="pUser"></span></p>
+<p><strong>Rank:</strong> <span id="pRank"></span></p>
+<p><strong>Group:</strong> <span id="pGroup"></span></p>
+<p><strong>Member #:</strong> <span id="pNum"></span></p>
 
-    <h3>My Availability</h3>
-    <div id="profileRoster"></div>
-  </div>
+<h3>My Availability</h3>
+<div id="profileRoster"></div>
+</div>
 
-  <!-- ROSTER -->
-  <div class="screen" id="roster">
-    <h2>Unit Roster</h2>
-    <div id="rosterView"></div>
-  </div>
+<div class="screen" id="roster">
+<h2>Unit Roster</h2>
+<div id="rosterView"></div>
+</div>
 
-  <!-- ADMIN -->
-  <div class="screen" id="admin">
-    <h2>Members</h2>
+<div class="screen" id="admin">
+<h2>Members</h2>
 
-    <div id="createBox" style="display:none">
-      <h3>Add Member</h3>
-      <input id="addName" placeholder="Full name">
-      <input id="addUsername" placeholder="Username">
-      <input id="addPassword" placeholder="Password">
-      <input id="addNumber" placeholder="Member number">
-      <select id="addRank"></select>
-      <select id="addGroup"></select>
-      <button onclick="createUser()">Create Member</button>
-      <hr>
-    </div>
+<div id="createBox">
+<h3>Add Member</h3>
+<input id="addName" placeholder="Full name">
+<input id="addUsername" placeholder="Username">
+<input id="addPassword" placeholder="Password">
+<input id="addNumber" placeholder="Member number">
+<select id="addRank"></select>
+<select id="addGroup"></select>
+<button onclick="createUser()">Create Member</button>
+<hr>
+</div>
 
-    <div id="memberList"></div>
-  </div>
+<div id="memberList"></div>
+
+</div>
 
 </div>
 
 <script>
+
 const SHIFTS=["Tue-D","Tue-N","Wed-D","Wed-N","Thu-D","Thu-N","Fri-D","Fri-N","Sat-D","Sat-N"];
 
 const RANKS=[
-  "Unit Member",
-  "Section Leader",
-  "Deputy Controller",
-  "Controller",
-  "Staff",
-  "Super Admin"
+"Unit Member",
+"Section Leader",
+"Deputy Controller",
+"Controller",
+"Staff",
+"Super Admin"
 ];
 
 const GROUPS=[
-  "Probation",
-  "Member Operational",
-  "UDO",
-  "Life Member",
-  "Ops Officer"
+"Probation",
+"Member Operational",
+"UDO",
+"Life Member",
+"Ops Officer"
 ];
 
-const GROUP_ASSIGN={
-  "Section Leader":["Probation","Member Operational","UDO"],
-  "Deputy Controller":GROUPS,
-  "Controller":GROUPS,
-  "Staff":GROUPS,
-  "Super Admin":GROUPS
-};
-
-const DELETE_ALLOWED=["Controller","Staff","Super Admin"];
+const ADMIN_RANKS=[
+"Section Leader",
+"Deputy Controller",
+"Controller",
+"Staff",
+"Super Admin"
+];
 
 let users=JSON.parse(localStorage.getItem("users"))||{
-  admin:{
-    username:"admin",
-    name:"Aaron Robbins",
-    pass:"admin",
-    rank:"Super Admin",
-    group:"Member Operational",
-    num:"33",
-    roster:{}
-  }
+admin:{
+username:"admin",
+name:"Aaron Robbins",
+pass:"admin",
+rank:"Super Admin",
+group:"Member Operational",
+num:"33",
+roster:{}
+}
 };
 
-let currentUser="";
+let currentUser=localStorage.getItem("session")||"";
 
-function save(){localStorage.setItem("users",JSON.stringify(users));}
-function toggleMenu(){menu.classList.toggle("open");}
+function save(){
+localStorage.setItem("users",JSON.stringify(users));
+}
+
+function toggleMenu(){
+menu.classList.toggle("open");
+}
 
 function openScreen(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  menu.classList.remove("open");
-  if(id==="admin")renderAdmin();
-  if(id==="roster")renderRoster();
+document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+menu.classList.remove("open");
+
+if(id==="admin")renderAdmin();
+if(id==="roster")renderRoster();
 }
 
 function login(){
-  const u=loginUser.value,p=loginPass.value;
-  const user=Object.values(users).find(x=>x.username===u&&x.pass===p);
-  if(!user){loginErr.style.display="block";return;}
-  currentUser=user.username;
-  menuUser.innerText=`${user.num} ${user.name}`;
-  pName.innerText=user.name;
-  pUser.innerText=user.username;
-  pRank.innerText=user.rank;
-  pGroup.innerText=user.group;
-  pNum.innerText=user.num;
-  loginScreen.style.display="none";
-  app.style.display="block";
-  if(user.rank!=="Unit Member"){
-    adminMenu.innerHTML='<button onclick="openScreen(`admin`)">Admin</button>';
-  } else adminMenu.innerHTML="";
-  renderProfileRoster();
+
+const u=loginUser.value;
+const p=loginPass.value;
+
+const user=Object.values(users).find(x=>x.username===u&&x.pass===p);
+
+if(!user){
+loginErr.style.display="block";
+return;
+}
+
+currentUser=user.username;
+localStorage.setItem("session",currentUser);
+
+initApp();
+
+}
+
+function initApp(){
+
+const user=users[currentUser];
+
+menuUser.innerText=`${user.num} ${user.name}`;
+pName.innerText=user.name;
+pUser.innerText=user.username;
+pRank.innerText=user.rank;
+pGroup.innerText=user.group;
+pNum.innerText=user.num;
+
+loginScreen.style.display="none";
+app.style.display="block";
+
+if(ADMIN_RANKS.includes(user.rank)){
+adminMenu.innerHTML='<button onclick="openScreen(`admin`)">Admin</button>';
+}else{
+adminMenu.innerHTML="";
+}
+
+renderProfileRoster();
 }
 
 function logout(){
-  currentUser="";
-  app.style.display="none";
-  loginScreen.style.display="flex";
-  menu.classList.remove("open");
+currentUser="";
+localStorage.removeItem("session");
+app.style.display="none";
+loginScreen.style.display="flex";
+menu.classList.remove("open");
 }
 
 function renderProfileRoster(){
-  profileRoster.innerHTML="";
-  SHIFTS.forEach(s=>{
-    const v=users[currentUser].roster[s]||"";
-    profileRoster.innerHTML+=`
-      <div class="shift">
-        <strong>${s}</strong>
-        <select onchange="updateMyRoster('${s}',this.value)">
-          <option value="">—</option>
-          <option ${v==="YES"?"selected":""}>YES</option>
-          <option ${v==="RCR"?"selected":""}>RCR</option>
-          <option ${v==="NA"?"selected":""}>NA</option>
-        </select>
-      </div>`;
-  });
+
+profileRoster.innerHTML="";
+
+SHIFTS.forEach(s=>{
+
+const v=users[currentUser].roster[s]||"";
+
+profileRoster.innerHTML+=`
+<div class="shift">
+<strong>${s}</strong>
+<select onchange="updateMyRoster('${s}',this.value)">
+<option value="">—</option>
+<option ${v==="YES"?"selected":""}>YES</option>
+<option ${v==="RCR"?"selected":""}>RCR</option>
+<option ${v==="NA"?"selected":""}>NA</option>
+</select>
+</div>
+`;
+
+});
+
 }
 
 function updateMyRoster(shift,val){
-  users[currentUser].roster[shift]=val;
-  save();
+users[currentUser].roster[shift]=val;
+save();
 }
 
 function renderRoster(){
-  rosterView.innerHTML="";
-  SHIFTS.forEach(s=>{
-    rosterView.innerHTML+=`<h3>${s}</h3>`;
-    Object.values(users).forEach(u=>{
-      const v=u.roster[s];
-      if(v && v!=="NA"){
-        rosterView.innerHTML+=`
-          <div class="member">
-            <strong>${u.num} ${u.name}</strong> (${u.group}) – ${v}
-          </div>`;
-      }
-    });
-  });
+
+rosterView.innerHTML="";
+
+SHIFTS.forEach(s=>{
+
+rosterView.innerHTML+=`<h3>${s}</h3>`;
+
+Object.values(users).forEach(u=>{
+
+const v=u.roster[s];
+
+if(!v||v==="NA") return;
+
+let cls="";
+
+if(v==="YES") cls="yes";
+if(v==="RCR") cls="rcr";
+
+rosterView.innerHTML+=`
+<div class="member">
+<strong>${u.num} ${u.name}</strong> (${u.group}) 
+<span class="${cls}">${v}</span>
+</div>
+`;
+
+});
+
+});
+
 }
 
 function renderAdmin(){
-  const me=users[currentUser];
-  memberList.innerHTML="";
-  const canAdd=me.rank!=="Unit Member"&&me.rank!=="Section Leader";
-  createBox.style.display=canAdd?"block":"none";
 
-  if(canAdd){
-    addRank.innerHTML="";
-    RANKS.forEach(r=>addRank.innerHTML+=`<option>${r}</option>`);
-    addGroup.innerHTML="";
-    (GROUP_ASSIGN[me.rank]||[]).forEach(g=>addGroup.innerHTML+=`<option>${g}</option>`);
-  }
+const me=users[currentUser];
 
-  Object.values(users).forEach(u=>{
-    memberList.innerHTML+=`
-      <div class="member">
-        <strong>${u.num} ${u.name}</strong><br>
-        ${u.rank} / ${u.group}<br>
-        ${me.rank==="Section Leader"?"":`<button onclick="editUser('${u.username}')">Edit</button>`}
-        ${DELETE_ALLOWED.includes(me.rank)&&u.username!==currentUser?`<button class="delete-btn" onclick="deleteUser('${u.username}')">Delete</button>`:""}
-      </div>`;
-  });
+if(!ADMIN_RANKS.includes(me.rank)){
+alert("Access denied");
+openScreen("profile");
+return;
 }
 
-function editUser(username){
-  const me=users[currentUser];
-  const u=users[username];
-  const canEditOwnRank = me.rank==="Super Admin" || username!==currentUser;
+memberList.innerHTML="";
 
-  memberList.innerHTML=`
-    <div class="member">
-      Name <input id="eName" value="${u.name}">
-      Member # <input id="eNum" value="${u.num}">
-      Username <input id="eUser" value="${u.username}">
-      Password <input id="ePass" value="${u.pass}">
-      Rank
-      <select id="eRank" ${canEditOwnRank?"":"disabled"}>
-        ${RANKS.map(r=>`<option ${u.rank===r?"selected":""}>${r}</option>`).join("")}
-      </select>
-      Group
-      <select id="eGroup">
-        ${(GROUP_ASSIGN[me.rank]||[]).map(g=>`<option ${u.group===g?"selected":""}>${g}</option>`).join("")}
-      </select>
-      <button onclick="saveEdit('${username}')">Save</button>
-    </div>`;
-}
+addRank.innerHTML="";
+RANKS.forEach(r=>addRank.innerHTML+=`<option>${r}</option>`);
 
-function saveEdit(oldKey){
-  const newUser=eUser.value.trim();
-  users[newUser]={
-    username:newUser,
-    name:eName.value,
-    pass:ePass.value,
-    rank:eRank.value,
-    group:eGroup.value,
-    num:eNum.value,
-    roster:users[oldKey].roster||{}
-  };
-  if(newUser!==oldKey) delete users[oldKey];
-  save();
-  renderAdmin();
-}
+addGroup.innerHTML="";
+GROUPS.forEach(g=>addGroup.innerHTML+=`<option>${g}</option>`);
 
-function deleteUser(username){
-  if(!confirm("Delete this member?"))return;
-  delete users[username];
-  save();
-  renderAdmin();
+Object.values(users).forEach(u=>{
+
+memberList.innerHTML+=`
+<div class="member">
+<strong>${u.num} ${u.name}</strong><br>
+${u.rank} / ${u.group}<br>
+<button onclick="editUser('${u.username}')">Edit</button>
+${u.rank!=="Super Admin" && u.username!==currentUser ?
+`<button class="delete-btn" onclick="deleteUser('${u.username}')">Delete</button>` : ""}
+</div>
+`;
+
+});
+
 }
 
 function createUser(){
-  if(!addUsername.value||users[addUsername.value])return alert("Invalid username");
-  users[addUsername.value]={
-    username:addUsername.value,
-    name:addName.value,
-    pass:addPassword.value,
-    rank:addRank.value,
-    group:addGroup.value,
-    num:addNumber.value,
-    roster:{}
-  };
-  save();
-  addName.value=addUsername.value=addPassword.value=addNumber.value="";
-  renderAdmin();
+
+if(!addUsername.value){
+alert("Username required");
+return;
 }
+
+if(users[addUsername.value]){
+alert("Username already exists");
+return;
+}
+
+users[addUsername.value]={
+username:addUsername.value,
+name:addName.value,
+pass:addPassword.value,
+rank:addRank.value,
+group:addGroup.value,
+num:addNumber.value,
+roster:{}
+};
+
+save();
+
+addName.value="";
+addUsername.value="";
+addPassword.value="";
+addNumber.value="";
+
+renderAdmin();
+
+}
+
+function deleteUser(username){
+
+if(users[username].rank==="Super Admin"){
+alert("Cannot delete Super Admin");
+return;
+}
+
+if(!confirm("Delete this member?"))return;
+
+delete users[username];
+
+save();
+
+renderAdmin();
+
+}
+
+function editUser(username){
+
+const u=users[username];
+
+memberList.innerHTML=`
+<div class="member">
+Name <input id="eName" value="${u.name}">
+Member # <input id="eNum" value="${u.num}">
+Username <input id="eUser" value="${u.username}">
+Password <input id="ePass" value="${u.pass}">
+Rank
+<select id="eRank">
+${RANKS.map(r=>`<option ${u.rank===r?"selected":""}>${r}</option>`).join("")}
+</select>
+Group
+<select id="eGroup">
+${GROUPS.map(g=>`<option ${u.group===g?"selected":""}>${g}</option>`).join("")}
+</select>
+<button onclick="saveEdit('${username}')">Save</button>
+</div>
+`;
+
+}
+
+function saveEdit(oldKey){
+
+const newUser=eUser.value.trim();
+
+if(newUser!==oldKey && users[newUser]){
+alert("Username already exists");
+return;
+}
+
+users[newUser]={
+username:newUser,
+name:eName.value,
+pass:ePass.value,
+rank:eRank.value,
+group:eGroup.value,
+num:eNum.value,
+roster:users[oldKey].roster||{}
+};
+
+if(newUser!==oldKey) delete users[oldKey];
+
+save();
+
+renderAdmin();
+
+}
+
+if(currentUser && users[currentUser]){
+initApp();
+}
+
 </script>
 
 </body>

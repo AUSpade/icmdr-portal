@@ -1,76 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<title>iCmdr – POC</title>
+<title>iCmdr – SES Command Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="stylesheet" href="style.css">
 <script src="app.js" defer></script>
+
 </head>
 
 <body>
 
-<div class="login" id="loginScreen">
-<div class="card">
-<h2>Login</h2>
+<div id="loginScreen" class="login">
+
+<div class="login-card">
+
+<h1>iCmdr</h1>
+<p>SES Command System</p>
+
 <input id="loginUser" placeholder="Username">
 <input id="loginPass" type="password" placeholder="Password">
+
 <button onclick="login()">Login</button>
+
 <p id="loginErr" class="error">Invalid login</p>
+
 </div>
+
 </div>
 
 <div id="app">
 
-<div class="topbar">
-<strong>iCmdr – Morwell</strong>
-<div class="hamburger" onclick="toggleMenu()">☰</div>
+<header>
+
+<div class="logo">
+🚨 iCmdr
 </div>
 
-<div class="menu" id="menu">
-<h3 id="menuUser"></h3>
-<button onclick="openScreen('profile')">Profile</button>
-<button onclick="openScreen('roster')">Roster</button>
-<div id="adminMenu"></div>
+<div class="user">
+<span id="menuUser"></span>
 <button onclick="logout()">Logout</button>
 </div>
 
-<!-- PROFILE -->
+</header>
 
-<div class="screen active" id="profile">
+<div class="layout">
 
-<h2>Profile</h2>
+<aside class="sidebar">
 
-<p><strong>Name:</strong> <span id="pName"></span></p>
-<p><strong>Username:</strong> <span id="pUser"></span></p>
-<p><strong>Rank:</strong> <span id="pRank"></span></p>
-<p><strong>Group:</strong> <span id="pGroup"></span></p>
-<p><strong>Member #:</strong> <span id="pNum"></span></p>
+<button onclick="openScreen('dashboard')">Dashboard</button>
 
-<h3>My Availability</h3>
+<button onclick="openScreen('availability')">Availability</button>
 
-<div id="profileRoster"></div>
+<button onclick="openScreen('roster')">Roster</button>
+
+<button id="umtButton" onclick="openScreen('umt')">UMT</button>
+
+</aside>
+
+<main>
+
+<section id="dashboard" class="screen active">
+
+<h2>Operational Dashboard</h2>
+
+<div class="cards">
+
+<div class="card">
+<h3>Members Available</h3>
+<p id="dashMembers">0</p>
+</div>
+
+<div class="card">
+<h3>UDO On Duty</h3>
+<p id="dashUDO">—</p>
+</div>
+
+<div class="card">
+<h3>Vehicles Ready</h3>
+<p>3</p>
+</div>
+
+<div class="card">
+<h3>Active Incidents</h3>
+<p>0</p>
+</div>
 
 </div>
 
-<!-- ROSTER -->
+</section>
 
-<div class="screen" id="roster">
+<section id="availability" class="screen">
+
+<h2>My Availability</h2>
+
+<div id="availabilityGrid"></div>
+
+</section>
+
+<section id="roster" class="screen">
 
 <h2>Unit Roster</h2>
 
 <div id="rosterView"></div>
 
-</div>
+</section>
 
-<!-- ADMIN -->
+<section id="umt" class="screen">
 
-<div class="screen" id="umt">
+<h2>Unit Management Tool</h2>
 
-<h2>UMT – Member Management</h2>
-
-<div id="createBox">
+<div class="umt-create">
 
 <h3>Add Member</h3>
 
@@ -84,19 +126,25 @@
 
 <button onclick="createUser()">Create Member</button>
 
-<hr>
-
 </div>
+
+<hr>
 
 <div id="memberList"></div>
 
-</div>
+</section>
+
+</main>
 
 </div>
 
 <footer>
-iCmdr Proof of Concept – Data stored locally in browser
+
+iCmdr Proof of Concept – SES Morwell
+
 </footer>
+
+</div>
 
 </body>
 </html>

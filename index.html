@@ -13,6 +13,8 @@
 
 <body>
 
+<!-- LOGIN SCREEN -->
+
 <div id="loginScreen" class="login">
 
 <div class="login-card">
@@ -31,12 +33,14 @@
 
 </div>
 
+<!-- MAIN APP -->
+
 <div id="app">
 
 <header>
 
 <div class="logo">
-🚨 iCmdr
+🚨 iCmdr | Morwell SES
 </div>
 
 <div class="user">
@@ -48,6 +52,8 @@
 
 <div class="layout">
 
+<!-- SIDEBAR -->
+
 <aside class="sidebar">
 
 <button onclick="openScreen('dashboard')">Dashboard</button>
@@ -56,11 +62,23 @@
 
 <button onclick="openScreen('roster')">Roster</button>
 
-<button id="umtButton" onclick="openScreen('umt')">UMT</button>
+<button onclick="openScreen('incidents')">Incidents</button>
+
+<button onclick="openScreen('vehicles')">Vehicles</button>
+
+<button onclick="openScreen('training')">Training</button>
+
+<button onclick="openScreen('umt')">UMT</button>
+
+<button onclick="openScreen('settings')">Settings</button>
 
 </aside>
 
+<!-- MAIN CONTENT -->
+
 <main>
+
+<!-- DASHBOARD -->
 
 <section id="dashboard" class="screen active">
 
@@ -80,7 +98,7 @@
 
 <div class="card">
 <h3>Vehicles Ready</h3>
-<p>3</p>
+<p id="dashVehicles">0</p>
 </div>
 
 <div class="card">
@@ -92,6 +110,8 @@
 
 </section>
 
+<!-- AVAILABILITY -->
+
 <section id="availability" class="screen">
 
 <h2>My Availability</h2>
@@ -99,6 +119,8 @@
 <div id="availabilityGrid"></div>
 
 </section>
+
+<!-- ROSTER -->
 
 <section id="roster" class="screen">
 
@@ -108,29 +130,134 @@
 
 </section>
 
+<!-- INCIDENTS -->
+
+<section id="incidents" class="screen">
+
+<h2>Incidents</h2>
+
+<p>No active incidents.</p>
+
+</section>
+
+<!-- VEHICLES -->
+
+<section id="vehicles" class="screen">
+
+<h2>Vehicle Status</h2>
+
+<table class="vehicleTable">
+
+<tr>
+<th>Vehicle</th>
+<th>Location</th>
+<th>Status</th>
+<th>Available</th>
+</tr>
+
+<tr>
+<td>Rescue 1</td>
+<td>Morwell</td>
+<td>Online</td>
+<td><span class="dot green"></span></td>
+</tr>
+
+<tr>
+<td>Rescue 2</td>
+<td>Morwell</td>
+<td>Online</td>
+<td><span class="dot green"></span></td>
+</tr>
+
+<tr>
+<td>Support 1</td>
+<td>Morwell</td>
+<td>Online</td>
+<td><span class="dot green"></span></td>
+</tr>
+
+<tr>
+<td>Support 2</td>
+<td>Morwell</td>
+<td>Online</td>
+<td><span class="dot green"></span></td>
+</tr>
+
+<tr>
+<td>RB 521</td>
+<td>Morwell</td>
+<td>Online</td>
+<td><span class="dot green"></span></td>
+</tr>
+
+<tr>
+<td>RB 522</td>
+<td>Morwell</td>
+<td>Online</td>
+<td><span class="dot green"></span></td>
+</tr>
+
+<tr>
+<td>Storm Trailer</td>
+<td>Morwell</td>
+<td>Online</td>
+<td><span class="dot green"></span></td>
+</tr>
+
+<tr>
+<td>RCR Trailer</td>
+<td>Morwell</td>
+<td>Online</td>
+<td><span class="dot green"></span></td>
+</tr>
+
+</table>
+
+</section>
+
+<!-- TRAINING -->
+
+<section id="training" class="screen">
+
+<h2>Training</h2>
+
+<p>Training records coming soon.</p>
+
+</section>
+
+<!-- UMT -->
+
 <section id="umt" class="screen">
 
 <h2>Unit Management Tool</h2>
 
-<div class="umt-create">
+<div class="umtMenu">
 
-<h3>Add Member</h3>
+<button onclick="openUMT('members')">Member Management</button>
 
-<input id="addName" placeholder="Full name">
-<input id="addUsername" placeholder="Username">
-<input id="addPassword" placeholder="Password">
-<input id="addNumber" placeholder="Member number">
+<button onclick="openUMT('calendar')">Unit Calendar Management</button>
 
-<select id="addRank"></select>
-<select id="addGroup"></select>
+<button onclick="openUMT('announcements')">Unit Announcements</button>
 
-<button onclick="createUser()">Create Member</button>
+<button onclick="openUMT('tba1')">TBA</button>
+
+<button onclick="openUMT('tba2')">TBA</button>
 
 </div>
 
 <hr>
 
-<div id="memberList"></div>
+<div id="umtContent"></div>
+
+</section>
+
+<!-- SETTINGS -->
+
+<section id="settings" class="screen">
+
+<h2>Settings</h2>
+
+<p>System settings coming soon.</p>
 
 </section>
 

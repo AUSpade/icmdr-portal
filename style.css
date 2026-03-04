@@ -25,9 +25,7 @@ header{
 display:flex;
 justify-content:space-between;
 align-items:center;
-
 padding:14px 20px;
-
 background:var(--panel);
 
 }
@@ -36,12 +34,6 @@ background:var(--panel);
 
 font-weight:700;
 font-size:18px;
-
-}
-
-.user button{
-
-margin-left:10px;
 
 }
 
@@ -162,6 +154,54 @@ opacity:.9;
 
 }
 
+.vehicleTable{
+
+width:100%;
+border-collapse:collapse;
+
+}
+
+.vehicleTable th,
+.vehicleTable td{
+
+padding:10px;
+border-bottom:1px solid #333;
+
+}
+
+.dot{
+
+height:12px;
+width:12px;
+border-radius:50%;
+display:inline-block;
+
+}
+
+.green{
+
+background:var(--success);
+
+}
+
+.red{
+
+background:var(--danger);
+
+}
+
+.yellow{
+
+background:var(--warning);
+
+}
+
+.gray{
+
+background:#6b7280;
+
+}
+
 .member{
 
 background:var(--panel2);
@@ -180,22 +220,19 @@ margin-bottom:6px;
 
 }
 
-.yes{
-
-color:var(--success);
-
-}
-
-.rcr{
-
-color:var(--warning);
-
-}
-
 .error{
 
 color:#f87171;
 display:none;
+
+}
+
+.umtMenu{
+
+display:flex;
+flex-direction:column;
+gap:10px;
+margin-bottom:20px;
 
 }
 

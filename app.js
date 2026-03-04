@@ -1,6 +1,6 @@
 /* ---------------- VEHICLES ---------------- */
 
-const vehicles = [
+let vehicles = JSON.parse(localStorage.getItem("vehicles")) || [
 
 { name:"Rescue 1", location:"Morwell", status:"Online" },
 { name:"Rescue 2", location:"Morwell", status:"Online" },
@@ -12,6 +12,13 @@ const vehicles = [
 { name:"RCR Trailer", location:"Morwell", status:"Online" }
 
 ];
+
+function saveVehicles(){
+
+localStorage.setItem("vehicles",JSON.stringify(vehicles));
+
+}
+
 
 function renderVehicles(){
 
@@ -26,7 +33,7 @@ let rows=`
 </tr>
 `;
 
-vehicles.forEach(v=>{
+vehicles.forEach((v,index)=>{
 
 let dot="green";
 
@@ -36,16 +43,57 @@ if(v.status==="Service") dot="gray";
 
 rows+=`
 <tr>
+
 <td>${v.name}</td>
-<td>${v.location}</td>
-<td>${v.status}</td>
-<td><span class="dot ${dot}"></span></td>
+
+<td>
+<input value="${v.location}"
+onchange="updateVehicleLocation(${index},this.value)">
+</td>
+
+<td>
+<select onchange="updateVehicleStatus(${index},this.value)">
+
+<option ${v.status==="Online"?"selected":""}>Online</option>
+<option ${v.status==="Offline"?"selected":""}>Offline</option>
+<option ${v.status==="Training"?"selected":""}>Training</option>
+<option ${v.status==="Service"?"selected":""}>Service</option>
+
+</select>
+</td>
+
+<td>
+<span class="dot ${dot}"></span>
+</td>
+
 </tr>
 `;
 
 });
 
 table.innerHTML=rows;
+
+}
+
+
+function updateVehicleStatus(index,status){
+
+vehicles[index].status=status;
+
+saveVehicles();
+
+renderVehicles();
+
+renderDashboard();
+
+}
+
+
+function updateVehicleLocation(index,location){
+
+vehicles[index].location=location;
+
+saveVehicles();
 
 }
 
@@ -209,7 +257,9 @@ dashMembers.innerText=available;
 
 dashUDO.innerText="TBA";
 
-dashVehicles.innerText=vehicles.length;
+let ready=vehicles.filter(v=>v.status==="Online").length;
+
+dashVehicles.innerText=ready;
 
 }
 

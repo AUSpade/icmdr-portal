@@ -55,7 +55,7 @@ document.getElementById(id).classList.add("active");
 
 menu.classList.remove("open");
 
-if(id==="admin")renderAdmin();
+if(id==="umt")renderAdmin();
 
 if(id==="roster")renderRoster();
 

@@ -106,7 +106,7 @@ app.style.display="block";
 
 if(ADMIN_RANKS.includes(user.rank)){
 
-adminMenu.innerHTML='<button onclick="openScreen(`admin`)">Admin</button>';
+adminMenu.innerHTML='<button onclick="openScreen(`umt`)">UMT</button>';
 
 }
 

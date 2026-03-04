@@ -111,14 +111,6 @@ const SHIFTS=[
 
 /* ---------------- RANKS ---------------- */
 
-const RANKS=[
-"Unit Member",
-"Section Leader",
-"Deputy Controller",
-"Controller",
-"Staff",
-"Super Admin"
-];
 
 const GROUPS=[
 "Probation",

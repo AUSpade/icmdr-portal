@@ -39,8 +39,10 @@ SUPER_ADMIN:100
 
 function hasPermission(permission){
 
-const user = users[currentUser];
+if(!users || !users[currentUser]) return false;
 
-return user.power >= PERMISSIONS[permission];
+if(!PERMISSIONS[permission]) return false;
+
+return users[currentUser].power >= PERMISSIONS[permission];
 
 }

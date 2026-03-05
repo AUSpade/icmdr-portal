@@ -84,6 +84,8 @@ saveVehicles();
 
 renderVehicles();
 
+renderDashboard();
+
 function renderDashboard(){
 
 let available=0;

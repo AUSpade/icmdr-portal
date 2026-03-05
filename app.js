@@ -14,9 +14,7 @@ let vehicles = JSON.parse(localStorage.getItem("vehicles")) || [
 ];
 
 function saveVehicles(){
-
 localStorage.setItem("vehicles",JSON.stringify(vehicles));
-
 }
 
 
@@ -86,56 +84,6 @@ renderVehicles();
 
 renderDashboard();
 
-function renderDashboard(){
-
-let available=0;
-
-Object.values(users).forEach(u=>{
-
-Object.values(u.roster).forEach(v=>{
-
-if(v==="YES") available++;
-
-});
-
-});
-
-dashMembers.innerText=available;
-
-dashUDO.innerText="TBA";
-
-/* vehicles ready */
-
-let ready=vehicles.filter(v=>v.status==="Online").length;
-
-dashVehicles.innerText=ready;
-
-/* vehicle table */
-
-const table=document.getElementById("dashboardVehicles");
-
-let rows=`
-<tr>
-<th>Vehicle</th>
-<th>Status</th>
-<th>Location</th>
-</tr>
-`;
-
-vehicles.forEach(v=>{
-
-rows+=`
-<tr>
-<td>${v.name}</td>
-<td>${v.status}</td>
-<td>${v.location}</td>
-</tr>
-`;
-
-});
-
-table.innerHTML=rows;
-
 }
 
 
@@ -144,6 +92,8 @@ function updateVehicleLocation(index,location){
 vehicles[index].location=location;
 
 saveVehicles();
+
+renderDashboard();
 
 }
 
@@ -159,8 +109,7 @@ const SHIFTS=[
 ];
 
 
-/* ---------------- RANKS ---------------- */
-
+/* ---------------- GROUPS ---------------- */
 
 const GROUPS=[
 "Probation",
@@ -168,14 +117,6 @@ const GROUPS=[
 "UDO",
 "Life Member",
 "Ops Officer"
-];
-
-const ADMIN_RANKS=[
-"Section Leader",
-"Deputy Controller",
-"Controller",
-"Staff",
-"Super Admin"
 ];
 
 
@@ -202,9 +143,7 @@ let currentUser = localStorage.getItem("session") || "";
 /* ---------------- SAVE ---------------- */
 
 function save(){
-
 localStorage.setItem("users",JSON.stringify(users));
-
 }
 
 
@@ -241,10 +180,8 @@ const p=loginPass.value;
 const user=Object.values(users).find(x=>x.username===u && x.pass===p);
 
 if(!user){
-
 loginErr.style.display="block";
 return;
-
 }
 
 currentUser=user.username;
@@ -263,7 +200,6 @@ const user=users[currentUser];
 menuUser.innerText=`Logged in as ${user.name}`;
 
 loginScreen.style.display="none";
-
 app.style.display="block";
 
 renderDashboard();
@@ -291,13 +227,9 @@ function renderDashboard(){
 let available=0;
 
 Object.values(users).forEach(u=>{
-
 Object.values(u.roster).forEach(v=>{
-
 if(v==="YES") available++;
-
 });
-
 });
 
 dashMembers.innerText=available;
@@ -305,8 +237,34 @@ dashMembers.innerText=available;
 dashUDO.innerText="TBA";
 
 let ready=vehicles.filter(v=>v.status==="Online").length;
-
 dashVehicles.innerText=ready;
+
+
+/* dashboard vehicle table */
+
+const table=document.getElementById("dashboardVehicles");
+
+if(!table) return;
+
+let rows=`
+<tr>
+<th>Vehicle</th>
+<th>Status</th>
+<th>Location</th>
+</tr>
+`;
+
+vehicles.forEach(v=>{
+rows+=`
+<tr>
+<td>${v.name}</td>
+<td>${v.status}</td>
+<td>${v.location}</td>
+</tr>
+`;
+});
+
+table.innerHTML=rows;
 
 }
 
@@ -353,6 +311,8 @@ function updateMyRoster(shift,val){
 users[currentUser].roster[shift]=val;
 
 save();
+
+renderDashboard();
 
 }
 
@@ -423,15 +383,11 @@ renderAdmin();
 }
 
 if(section==="calendar"){
-
 content.innerHTML=`<h3>Unit Calendar</h3><p>Calendar system coming soon.</p>`;
-
 }
 
 if(section==="announcements"){
-
 content.innerHTML=`<h3>Unit Announcements</h3><p>Create announcements for members.</p>`;
-
 }
 
 }
@@ -442,10 +398,15 @@ content.innerHTML=`<h3>Unit Announcements</h3><p>Create announcements for member
 function renderAdmin(){
 
 addRank.innerHTML="";
-RANKS.forEach(r=>addRank.innerHTML+=`<option>${r}</option>`);
+
+Object.keys(RANKS).forEach(r=>{
+addRank.innerHTML+=`<option>${r}</option>`;
+});
 
 addGroup.innerHTML="";
-GROUPS.forEach(g=>addGroup.innerHTML+=`<option>${g}</option>`);
+GROUPS.forEach(g=>{
+addGroup.innerHTML+=`<option>${g}</option>`;
+});
 
 memberList.innerHTML="";
 
@@ -473,17 +434,13 @@ ${u.rank} / ${u.group}
 function createUser(){
 
 if(!addUsername.value){
-
 alert("Username required");
 return;
-
 }
 
 if(users[addUsername.value]){
-
 alert("Username exists");
 return;
-
 }
 
 users[addUsername.value]={
@@ -497,7 +454,6 @@ group:addGroup.value,
 num:addNumber.value,
 roster:{}
 
-
 };
 
 save();
@@ -510,7 +466,5 @@ renderAdmin();
 /* ---------------- AUTO LOGIN ---------------- */
 
 if(currentUser && users[currentUser]){
-
 initApp();
-
 }

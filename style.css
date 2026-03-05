@@ -11,14 +11,24 @@
 
 }
 
+/* ---------------- GLOBAL ---------------- */
+
 body{
 
 margin:0;
-font-family:system-ui;
+font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 background:var(--bg);
 color:var(--text);
 
 }
+
+h1,h2,h3{
+
+margin-top:0;
+
+}
+
+/* ---------------- HEADER ---------------- */
 
 header{
 
@@ -27,6 +37,7 @@ justify-content:space-between;
 align-items:center;
 padding:14px 20px;
 background:var(--panel);
+border-bottom:1px solid #2b3546;
 
 }
 
@@ -37,12 +48,24 @@ font-size:18px;
 
 }
 
+.user{
+
+display:flex;
+align-items:center;
+gap:10px;
+
+}
+
+/* ---------------- LAYOUT ---------------- */
+
 .layout{
 
 display:flex;
 height:calc(100vh - 60px);
 
 }
+
+/* ---------------- SIDEBAR ---------------- */
 
 .sidebar{
 
@@ -52,6 +75,7 @@ padding:20px;
 display:flex;
 flex-direction:column;
 gap:10px;
+border-right:1px solid #2b3546;
 
 }
 
@@ -63,6 +87,9 @@ border-radius:6px;
 background:#2a3342;
 color:white;
 cursor:pointer;
+text-align:left;
+font-weight:500;
+transition:background 0.2s;
 
 }
 
@@ -72,6 +99,8 @@ background:var(--accent);
 
 }
 
+/* ---------------- MAIN CONTENT ---------------- */
+
 main{
 
 flex:1;
@@ -79,6 +108,8 @@ padding:25px;
 overflow:auto;
 
 }
+
+/* ---------------- SCREENS ---------------- */
 
 .screen{
 
@@ -91,6 +122,8 @@ display:none;
 display:block;
 
 }
+
+/* ---------------- DASHBOARD CARDS ---------------- */
 
 .cards{
 
@@ -105,8 +138,24 @@ gap:20px;
 background:var(--panel2);
 padding:20px;
 border-radius:8px;
+box-shadow:0 0 10px rgba(0,0,0,0.35);
 
 }
+
+.card h3{
+
+margin-bottom:6px;
+
+}
+
+.card p{
+
+font-size:22px;
+font-weight:600;
+
+}
+
+/* ---------------- LOGIN ---------------- */
 
 .login{
 
@@ -124,18 +173,33 @@ padding:30px;
 border-radius:10px;
 width:300px;
 text-align:center;
+box-shadow:0 0 20px rgba(0,0,0,0.4);
 
 }
 
-input,select{
+.login-card input,
+.login-card button{
+
+margin-top:12px;
+
+}
+
+/* ---------------- INPUTS ---------------- */
+
+input,
+select{
 
 width:100%;
 padding:10px;
 margin-top:10px;
 border:none;
 border-radius:6px;
+background:#2a3342;
+color:white;
 
 }
+
+/* ---------------- BUTTONS ---------------- */
 
 button{
 
@@ -145,6 +209,7 @@ border-radius:6px;
 cursor:pointer;
 background:var(--accent);
 color:white;
+font-weight:600;
 
 }
 
@@ -154,20 +219,32 @@ opacity:.9;
 
 }
 
+/* ---------------- TABLES ---------------- */
+
 .vehicleTable{
 
 width:100%;
 border-collapse:collapse;
+margin-top:10px;
 
 }
 
-.vehicleTable th,
+.vehicleTable th{
+
+text-align:left;
+padding:10px;
+border-bottom:2px solid #444;
+
+}
+
 .vehicleTable td{
 
 padding:10px;
 border-bottom:1px solid #333;
 
 }
+
+/* ---------------- STATUS DOTS ---------------- */
 
 .dot{
 
@@ -202,6 +279,8 @@ background:#6b7280;
 
 }
 
+/* ---------------- MEMBER LIST ---------------- */
+
 .member{
 
 background:var(--panel2);
@@ -211,14 +290,18 @@ margin-bottom:8px;
 
 }
 
+/* ---------------- SHIFT CARDS ---------------- */
+
 .shift{
 
 background:#1e293b;
-padding:8px;
+padding:10px;
 border-radius:6px;
-margin-bottom:6px;
+margin-bottom:8px;
 
 }
+
+/* ---------------- ERROR ---------------- */
 
 .error{
 
@@ -226,6 +309,8 @@ color:#f87171;
 display:none;
 
 }
+
+/* ---------------- UMT MENU ---------------- */
 
 .umtMenu{
 
@@ -236,11 +321,14 @@ margin-bottom:20px;
 
 }
 
+/* ---------------- FOOTER ---------------- */
+
 footer{
 
 text-align:center;
 padding:12px;
 font-size:12px;
 color:#888;
+border-top:1px solid #2b3546;
 
 }
